@@ -24,6 +24,7 @@ urlpatterns = [
     path('privacy/', views.privacy, name='privacy'),
     path('news/', views.news, name='news'),
     path('live-charts/', views.live_charts, name='live_charts'),
-    path('market-data/', views.market_data_api, name='market_data_api'),
+    path('api/market-data/', views.market_data_api, name='market_data_api'),
+
     
 ]

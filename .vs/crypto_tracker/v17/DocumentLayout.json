@@ -3,10 +3,6 @@
   "WorkspaceRootPath": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templatetags\\format_filters.py||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\templatetags\\format_filters.py||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\urls.py||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\urls.py||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
@@ -19,20 +15,24 @@
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\templates\\dashboard.html||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\home.html||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\templates\\home.html||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\base.html||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\templates\\base.html||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\crypto_tracker\\settings.py||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:crypto_tracker\\settings.py||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templatetags\\__init__.py||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\templatetags\\__init__.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templatetags\\format_filters.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\templatetags\\format_filters.py||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\base.html||{3B902123-F8A7-4915-9F01-361F908088D0}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\templates\\base.html||{3B902123-F8A7-4915-9F01-361F908088D0}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\home.html||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\templates\\home.html||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templatetags\\__init__.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\templatetags\\__init__.py||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\staticfiles\\css\\style.css||{3B902123-F8A7-4915-9F01-361F908088D0}",
@@ -182,7 +182,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 9,
           "Children": [
             {
               "$type": "Bookmark",
@@ -198,17 +198,18 @@
               "RelativeToolTip": "static\\css\\style.css",
               "ViewState": "AQIAAJkAAAAAAAAAAAAgwK8AAAABAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2025-08-14T11:39:25.307Z"
+              "WhenOpened": "2025-08-14T11:39:25.307Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 3,
               "Title": "base.html",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\base.html",
               "RelativeDocumentMoniker": "tracker\\templates\\base.html",
               "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\base.html",
               "RelativeToolTip": "tracker\\templates\\base.html",
-              "ViewState": "AQIAAAcAAAAAAAAAAAAgwBgAAAAAAAAA",
+              "ViewState": "AQIAAPcAAAAAAAAAAAAgwA0BAAAHAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
               "WhenOpened": "2025-08-14T11:40:42.799Z",
               "EditorCaption": ""
@@ -228,7 +229,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 6,
               "Title": "home.html",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\home.html",
               "RelativeDocumentMoniker": "tracker\\templates\\home.html",
@@ -241,46 +242,46 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 5,
               "Title": "format_filters.py",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templatetags\\format_filters.py",
               "RelativeDocumentMoniker": "tracker\\templatetags\\format_filters.py",
               "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templatetags\\format_filters.py",
               "RelativeToolTip": "tracker\\templatetags\\format_filters.py",
-              "ViewState": "AQIAAB0AAAAAAAAAAAAqwDIAAAARAAAA",
+              "ViewState": "AQIAAB8AAAAAAAAAAAAkwDIAAAARAAAA",
               "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHeSURBVDhPpVMxa1NRFP7ebZLSlgaltNpSVCySRUxL0NAh4FJpHWpxcZAUBEPG/AKHDsVBN5eGrCnoYKCDoDiUCKKBjtZBUZtJ2ojYJr40ue\u002B\u002B47k3VzD0hQr94OOed8853/k47z2cCETk2NAgk8mQDQMhhFjK5/Mb9vEotIDruoEsFovEzVvZbPaWLTcQ9uxCpVLp4l\u002Bk0\u002BlEPB5/wIPm7RVC9uxCMpm0UTdKpRKi0WiCQy3wUt8FCvw7VSNxbRapG4voDwucGgyjXC7bzH84ePt1HysbH/GhWoNstzA1OoSFhZuxQqFg8sfu4FutAd\u002BT8KSEYm7v7GJ0YnLClgYLaAcjU9N4Vx9Dda8OBz7OjwywSNsIXY39vEL7TxWpxv2eO3hWHUZ19xc8ti25UdvXzdpNWH0BDj8JiLOrPXfweOu9mRgRhOXUEPr7IiBfYeacB9HaBNRvQH4f6\u002BlgMERwGxJP7grEoq9shj9Uz\u002BVGpmIi4vXcwdzlcePgzLAuZPiSGw869Jg\u002Biw1Mvw50oLGcuoh71y8h1HwB1Js8UfFLnwScNnBhdYVLWsy1IwK5XM5GHaw9uu0LeSCMddZA32lz7zjOQxMcByK1SPU3O/Rjnai2fkjNz8/5L77TyQJ/AJc67LNf3QeWAAAAAElFTkSuQmCC",
               "WhenOpened": "2025-08-14T12:05:49.378Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "views.py",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\views.py",
               "RelativeDocumentMoniker": "tracker\\views.py",
               "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\views.py",
               "RelativeToolTip": "tracker\\views.py",
-              "ViewState": "AQIAABEBAAAAAAAAAAAqwCYBAAA6AAAA",
+              "ViewState": "AQIAABMBAAAAAAAAAAAqwCgBAAAAAAAA",
               "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHeSURBVDhPpVMxa1NRFP7ebZLSlgaltNpSVCySRUxL0NAh4FJpHWpxcZAUBEPG/AKHDsVBN5eGrCnoYKCDoDiUCKKBjtZBUZtJ2ojYJr40ue\u002B\u002B47k3VzD0hQr94OOed8853/k47z2cCETk2NAgk8mQDQMhhFjK5/Mb9vEotIDruoEsFovEzVvZbPaWLTcQ9uxCpVLp4l\u002Bk0\u002BlEPB5/wIPm7RVC9uxCMpm0UTdKpRKi0WiCQy3wUt8FCvw7VSNxbRapG4voDwucGgyjXC7bzH84ePt1HysbH/GhWoNstzA1OoSFhZuxQqFg8sfu4FutAd\u002BT8KSEYm7v7GJ0YnLClgYLaAcjU9N4Vx9Dda8OBz7OjwywSNsIXY39vEL7TxWpxv2eO3hWHUZ19xc8ti25UdvXzdpNWH0BDj8JiLOrPXfweOu9mRgRhOXUEPr7IiBfYeacB9HaBNRvQH4f6\u002BlgMERwGxJP7grEoq9shj9Uz\u002BVGpmIi4vXcwdzlcePgzLAuZPiSGw869Jg\u002Biw1Mvw50oLGcuoh71y8h1HwB1Js8UfFLnwScNnBhdYVLWsy1IwK5XM5GHaw9uu0LeSCMddZA32lz7zjOQxMcByK1SPU3O/Rjnai2fkjNz8/5L77TyQJ/AJc67LNf3QeWAAAAAElFTkSuQmCC",
               "WhenOpened": "2025-08-14T11:43:04.965Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 4,
               "Title": "settings.py",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\crypto_tracker\\settings.py",
               "RelativeDocumentMoniker": "crypto_tracker\\settings.py",
               "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\crypto_tracker\\settings.py",
               "RelativeToolTip": "crypto_tracker\\settings.py",
-              "ViewState": "AQIAAEwAAAAAAAAAAAAqwGEAAAAAAAAA",
+              "ViewState": "AQIAAAYAAAAAAAAAAAAAABQAAAAeAAAA",
               "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHeSURBVDhPpVMxa1NRFP7ebZLSlgaltNpSVCySRUxL0NAh4FJpHWpxcZAUBEPG/AKHDsVBN5eGrCnoYKCDoDiUCKKBjtZBUZtJ2ojYJr40ue\u002B\u002B47k3VzD0hQr94OOed8853/k47z2cCETk2NAgk8mQDQMhhFjK5/Mb9vEotIDruoEsFovEzVvZbPaWLTcQ9uxCpVLp4l\u002Bk0\u002BlEPB5/wIPm7RVC9uxCMpm0UTdKpRKi0WiCQy3wUt8FCvw7VSNxbRapG4voDwucGgyjXC7bzH84ePt1HysbH/GhWoNstzA1OoSFhZuxQqFg8sfu4FutAd\u002BT8KSEYm7v7GJ0YnLClgYLaAcjU9N4Vx9Dda8OBz7OjwywSNsIXY39vEL7TxWpxv2eO3hWHUZ19xc8ti25UdvXzdpNWH0BDj8JiLOrPXfweOu9mRgRhOXUEPr7IiBfYeacB9HaBNRvQH4f6\u002BlgMERwGxJP7grEoq9shj9Uz\u002BVGpmIi4vXcwdzlcePgzLAuZPiSGw869Jg\u002Biw1Mvw50oLGcuoh71y8h1HwB1Js8UfFLnwScNnBhdYVLWsy1IwK5XM5GHaw9uu0LeSCMddZA32lz7zjOQxMcByK1SPU3O/Rjnai2fkjNz8/5L77TyQJ/AJc67LNf3QeWAAAAAElFTkSuQmCC",
               "WhenOpened": "2025-08-14T11:29:47.286Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "dashboard.html",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\dashboard.html",
               "RelativeDocumentMoniker": "tracker\\templates\\dashboard.html",
@@ -293,13 +294,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "urls.py",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\urls.py",
               "RelativeDocumentMoniker": "tracker\\urls.py",
               "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\urls.py",
               "RelativeToolTip": "tracker\\urls.py",
-              "ViewState": "AQIAAAwAAAAAAAAAAAAAABsAAAAEAAAA",
+              "ViewState": "AQIAAAcAAAAAAAAAAAAqwBoAAAAEAAAA",
               "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHeSURBVDhPpVMxa1NRFP7ebZLSlgaltNpSVCySRUxL0NAh4FJpHWpxcZAUBEPG/AKHDsVBN5eGrCnoYKCDoDiUCKKBjtZBUZtJ2ojYJr40ue\u002B\u002B47k3VzD0hQr94OOed8853/k47z2cCETk2NAgk8mQDQMhhFjK5/Mb9vEotIDruoEsFovEzVvZbPaWLTcQ9uxCpVLp4l\u002Bk0\u002BlEPB5/wIPm7RVC9uxCMpm0UTdKpRKi0WiCQy3wUt8FCvw7VSNxbRapG4voDwucGgyjXC7bzH84ePt1HysbH/GhWoNstzA1OoSFhZuxQqFg8sfu4FutAd\u002BT8KSEYm7v7GJ0YnLClgYLaAcjU9N4Vx9Dda8OBz7OjwywSNsIXY39vEL7TxWpxv2eO3hWHUZ19xc8ti25UdvXzdpNWH0BDj8JiLOrPXfweOu9mRgRhOXUEPr7IiBfYeacB9HaBNRvQH4f6\u002BlgMERwGxJP7grEoq9shj9Uz\u002BVGpmIi4vXcwdzlcePgzLAuZPiSGw869Jg\u002Biw1Mvw50oLGcuoh71y8h1HwB1Js8UfFLnwScNnBhdYVLWsy1IwK5XM5GHaw9uu0LeSCMddZA32lz7zjOQxMcByK1SPU3O/Rjnai2fkjNz8/5L77TyQJ/AJc67LNf3QeWAAAAAElFTkSuQmCC",
               "WhenOpened": "2025-08-14T11:43:37.021Z",
               "EditorCaption": ""
@@ -342,7 +343,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "__init__.py",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templatetags\\__init__.py",
               "RelativeDocumentMoniker": "tracker\\templatetags\\__init__.py",
@@ -350,8 +351,7 @@
               "RelativeToolTip": "tracker\\templatetags\\__init__.py",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHeSURBVDhPpVMxa1NRFP7ebZLSlgaltNpSVCySRUxL0NAh4FJpHWpxcZAUBEPG/AKHDsVBN5eGrCnoYKCDoDiUCKKBjtZBUZtJ2ojYJr40ue\u002B\u002B47k3VzD0hQr94OOed8853/k47z2cCETk2NAgk8mQDQMhhFjK5/Mb9vEotIDruoEsFovEzVvZbPaWLTcQ9uxCpVLp4l\u002Bk0\u002BlEPB5/wIPm7RVC9uxCMpm0UTdKpRKi0WiCQy3wUt8FCvw7VSNxbRapG4voDwucGgyjXC7bzH84ePt1HysbH/GhWoNstzA1OoSFhZuxQqFg8sfu4FutAd\u002BT8KSEYm7v7GJ0YnLClgYLaAcjU9N4Vx9Dda8OBz7OjwywSNsIXY39vEL7TxWpxv2eO3hWHUZ19xc8ti25UdvXzdpNWH0BDj8JiLOrPXfweOu9mRgRhOXUEPr7IiBfYeacB9HaBNRvQH4f6\u002BlgMERwGxJP7grEoq9shj9Uz\u002BVGpmIi4vXcwdzlcePgzLAuZPiSGw869Jg\u002Biw1Mvw50oLGcuoh71y8h1HwB1Js8UfFLnwScNnBhdYVLWsy1IwK5XM5GHaw9uu0LeSCMddZA32lz7zjOQxMcByK1SPU3O/Rjnai2fkjNz8/5L77TyQJ/AJc67LNf3QeWAAAAAElFTkSuQmCC",
-              "WhenOpened": "2025-08-14T12:29:49.446Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-14T12:29:49.446Z"
             },
             {
               "$type": "Document",
@@ -363,8 +363,7 @@
               "RelativeToolTip": "manage.py",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHeSURBVDhPpVMxa1NRFP7ebZLSlgaltNpSVCySRUxL0NAh4FJpHWpxcZAUBEPG/AKHDsVBN5eGrCnoYKCDoDiUCKKBjtZBUZtJ2ojYJr40ue\u002B\u002B47k3VzD0hQr94OOed8853/k47z2cCETk2NAgk8mQDQMhhFjK5/Mb9vEotIDruoEsFovEzVvZbPaWLTcQ9uxCpVLp4l\u002Bk0\u002BlEPB5/wIPm7RVC9uxCMpm0UTdKpRKi0WiCQy3wUt8FCvw7VSNxbRapG4voDwucGgyjXC7bzH84ePt1HysbH/GhWoNstzA1OoSFhZuxQqFg8sfu4FutAd\u002BT8KSEYm7v7GJ0YnLClgYLaAcjU9N4Vx9Dda8OBz7OjwywSNsIXY39vEL7TxWpxv2eO3hWHUZ19xc8ti25UdvXzdpNWH0BDj8JiLOrPXfweOu9mRgRhOXUEPr7IiBfYeacB9HaBNRvQH4f6\u002BlgMERwGxJP7grEoq9shj9Uz\u002BVGpmIi4vXcwdzlcePgzLAuZPiSGw869Jg\u002Biw1Mvw50oLGcuoh71y8h1HwB1Js8UfFLnwScNnBhdYVLWsy1IwK5XM5GHaw9uu0LeSCMddZA32lz7zjOQxMcByK1SPU3O/Rjnai2fkjNz8/5L77TyQJ/AJc67LNf3QeWAAAAAElFTkSuQmCC",
-              "WhenOpened": "2025-08-14T15:06:40.312Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-14T15:06:40.312Z"
             },
             {
               "$type": "Document",
@@ -376,8 +375,7 @@
               "RelativeToolTip": "Dockerfile",
               "ViewState": "AQIAABwAAAAAAAAAAAAiwDIAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-08-14T15:06:56.952Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-14T15:06:56.952Z"
             },
             {
               "$type": "Document",
@@ -389,8 +387,7 @@
               "RelativeToolTip": "docker-compose.yml",
               "ViewState": "AQIAABQAAAAAAAAAAAAgwCoAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
-              "WhenOpened": "2025-08-14T15:09:30.761Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-14T15:09:30.761Z"
             },
             {
               "$type": "Document",

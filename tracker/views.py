@@ -293,3 +293,4 @@ def alerts_api(request):
         return JsonResponse({"alerts": alerts_data})
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+    
