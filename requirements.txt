@@ -25,6 +25,8 @@ django-redis==5.4.0
 redis==5.1.1
 celery>=5.3
 django-environ
+channels
+
 
 
 
