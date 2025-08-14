@@ -1,0 +1,15 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\static",
+    "\\staticfiles",
+    "\\staticfiles\\css",
+    "\\static\\js",
+    "\\tracker",
+    "\\tracker\\static",
+    "\\tracker\\templates",
+    "\\tracker\\templates\\registration"
+  ],
+  "SelectedNode": "\\tracker\\templates\\base.html",
+  "PreviewInSolutionExplorer": false
+}

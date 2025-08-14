@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load format_filters %}
+{% block title %}Search - Crypto Tracker{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Search Results for "{{ query }}"</h2>
+    {% if results %}
+        <table class="table table-striped animate-table">
+            <thead>
+                <tr>
+                    <th>Coin</th>
+                    <th>Price (USD)</th>
+                    <th>24h Change</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for coin_id, data in results.items %}
+                <tr class="animate-row" style="--row-index: {{ forloop.counter0 }};">
+                    <td>{{ coin_id|capitalize_value }}</td>
+                    <td class="price-slide">${{ data.usd|format_currency }}</td>
+                    <td class="{% if data.usd_24h_change >= 0 %}positive{% else %}negative{% endif %}">
+                        {{ data.usd_24h_change|floatformat:2 }}%
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-info">No results found for "{{ query }}".</div>
+    {% endif %}
+</div>
+{% endblock %}

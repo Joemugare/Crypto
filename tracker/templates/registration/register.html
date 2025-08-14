@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Register - Crypto Tracker{% endblock %}
+{% block content %}
+<h2>Register</h2>
+{% if form.errors %}
+    <div class="alert alert-warning" role="alert">Please correct the errors below:</div>
+    {{ form.errors }}
+{% endif %}
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Register</button>
+</form>
+<p><a href="{% url 'login' %}">Already have an account? Log in</a></p>
+{% endblock %}

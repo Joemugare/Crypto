@@ -1,0 +1,176 @@
+/* tracker/static/css/style.css */
+:root {
+    --bg-color: #212529;
+    --text-color: #f8f9fa;
+    --navbar-bg: #343a40;
+    --navbar-text: #f8f9fa;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+body[data-theme="light"] .navbar-dark {
+    background-color: var(--navbar-bg) !important;
+    color: var(--navbar-text) !important;
+}
+
+.nav-link.active {
+    font-weight: bold;
+    border-bottom: 2px solid #00d4ff;
+}
+
+.animate-nav {
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.animate-nav:hover {
+    transform: translateY(-2px);
+    color: #00d4ff !important;
+}
+
+.animate-button {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.animate-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.search-input {
+    max-width: 200px;
+}
+
+footer a:hover {
+    color: #00d4ff !important;
+}
+
+.ticker-container {
+    overflow: hidden;
+    background: #0e1a2b;
+    padding: 10px;
+    border-radius: 10px;
+    color: #fff;
+    position: relative;
+}
+
+.ticker {
+    display: flex;
+    animation: scroll 25s linear infinite;
+}
+
+.ticker:hover {
+    animation-play-state: paused;
+}
+
+.ticker-item {
+    margin-right: 50px;
+    white-space: nowrap;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.ticker-item:hover {
+    color: #00d4ff;
+}
+
+@keyframes scroll {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+.sentiment-widget {
+    background: var(--navbar-bg);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.sentiment-score {
+    margin-top: 10px;
+}
+
+.progress-bar {
+    transition: width 0.5s ease;
+}
+
+.positive {
+    color: #00ff85;
+}
+
+.negative {
+    color: #ff4b5c;
+}
+
+.animate-table {
+    opacity: 0;
+    animation: fadeIn 1s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.price-slide {
+    opacity: 0;
+    transform: translateX(50px);
+    animation: slideInRight 0.5s ease-out forwards;
+    animation-delay: calc(0.1s * var(--row-index));
+}
+
+@keyframes slideInRight {
+    0% { opacity: 0; transform: translateX(50px); }
+    100% { opacity: 1; transform: translateX(0); }
+}
+
+.animate-row:hover {
+    background-color: #f1f1f1;
+    transform: scale(1.02);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.glow-effect {
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+.portfolio-stats {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.stat-item {
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.stat-label {
+    font-size: 1rem;
+    color: #6c757d;
+}
+
+.coin-link {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.coin-link:hover {
+    color: #00d4ff;
+}

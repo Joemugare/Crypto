@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load format_filters %}
+
+{% block title %}Alerts - Crypto Tracker{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Price Alerts</h2>
+
+    <form method="post" action="{% url 'add_alert' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="cryptocurrency">Cryptocurrency:</label>
+            <input type="text" name="cryptocurrency" id="cryptocurrency" placeholder="e.g., bitcoin" required class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="target_price">Target Price (USD):</label>
+            <input type="number" step="0.01" name="target_price" id="target_price" placeholder="Target Price" required class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="condition">Condition:</label>
+            <select name="condition" id="condition" class="form-control">
+                <option value="above">Above</option>
+                <option value="below">Below</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Set Alert</button>
+    </form>
+
+    <div class="card mt-4 glow-effect">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-bell"></i> Your Alerts</h3>
+        </div>
+        <div class="card-body">
+            {% if alerts %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Cryptocurrency</th>
+                                <th>Target Price (USD)</th>
+                                <th>Condition</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alert in alerts %}
+                                <tr>
+                                    <td>{{ alert.cryptocurrency|capitalize_value }}</td>
+                                    <td>${{ alert.target_price|format_currency }}</td>
+                                    <td>{{ alert.condition|capitalize_value }}</td>
+                                    <td>
+                                        {% if alert.is_active %}
+                                            Active
+                                        {% else %}
+                                            Inactive
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-center mt-3">No alerts set. Add one above.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

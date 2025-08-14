@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static format_filters %}
+
+{% block title %}Live Charts - Crypto Tracker{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Live Cryptocurrency Charts</h2>
+    <div class="mb-3">
+        <select id="coinSelect" class="form-select w-auto d-inline-block">
+            <option value="">Select a cryptocurrency</option>
+            {% for coin_id, data in market_data.items %}
+                <option value="{{ coin_id }}" {% if request.GET.coin == coin_id %}selected{% endif %}>{{ coin_id|capitalize_value }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div id="tradingview_chart" style="height: 500px;" class="glow-effect"></div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const coinSelect = document.getElementById('coinSelect');
+        const defaultCoin = "{{ request.GET.coin|default:'bitcoin' }}";
+        function loadChart(coin) {
+            const symbol = `BINANCE:${coin.toUpperCase()}USDT`;
+            new TradingView.widget({
+                "width": "100%",
+                "height": "500",
+                "symbol": symbol,
+                "interval": "D",
+                "timezone": "Etc/UTC",
+                "theme": document.body.dataset.theme,
+                "style": "1",
+                "locale": "en",
+                "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false,
+                "allow_symbol_change": true,
+                "studies": ["RSI@tv-basicstudies", "MACD@tv-basicstudies"],
+                "container_id": "tradingview_chart"
+            });
+        }
+        coinSelect.addEventListener('change', () => {
+            const selectedCoin = coinSelect.value || 'bitcoin';
+            window.location.href = `{% url 'live_charts' %}?coin=${selectedCoin}`;
+        });
+        loadChart(defaultCoin);
+    });
+</script>
+{% endblock %}

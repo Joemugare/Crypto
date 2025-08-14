@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Profile - Crypto Tracker{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Profile</h2>
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email|default:"Not set" }}</p>
+    <a href="{% url 'settings' %}" class="btn btn-primary animate-button">Edit Settings</a>
+</div>
+{% endblock %}

@@ -1,0 +1,170 @@
+﻿{% extends 'base.html' %}
+{% load format_filters %}
+
+{% block title %}Dashboard - Crypto Tracker{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <!-- Alerts -->
+    {% if not is_data_live %}
+        <div class="alert alert-warning text-center glow-effect">
+            Using fallback data due to API rate limits.
+        </div>
+    {% endif %}
+    {% if portfolio_empty %}
+        <div class="alert alert-info text-center glow-effect">
+            Your portfolio is empty. Add holdings in the <a href="{% url 'portfolio' %}">Portfolio</a> section.
+        </div>
+    {% endif %}
+
+    <!-- Live Ticker -->
+    <div class="ticker-container mb-4 glow-effect">
+        <div class="ticker">
+            {% for coin_id, data in market_data.items %}
+                <div class="ticker-item">
+                    {{ coin_id|capitalize_value }}: ${{ data.usd|format_currency }} 
+                    {% if data.usd_24h_change >= 0 %}<span class="positive">▲ {{ data.usd_24h_change|abs_value|floatformat:2 }}%</span>
+                    {% else %}<span class="negative">▼ {{ data.usd_24h_change|abs_value|floatformat:2 }}%</span>{% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Portfolio Summary -->
+    <div class="card mb-4 pulse">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-wallet"></i> Portfolio Summary</h3>
+        </div>
+        <div class="card-body portfolio-stats">
+            <div class="stat-item">
+                <div class="stat-value positive">${{ summary_data.current_value|format_number }}</div>
+                <div class="stat-label">Current Value</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">${{ summary_data.invested|format_number }}</div>
+                <div class="stat-label">Invested</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value {% if summary_data.profit_loss >= 0 %}positive{% else %}negative{% endif %}">
+                    ${{ summary_data.profit_loss|format_number }}
+                </div>
+                <div class="stat-label">Profit/Loss</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row mb-4">
+        <!-- Line Chart -->
+        <div class="col-md-6">
+            <div class="card glow-effect">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-chart-line"></i> Portfolio Value</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="portfolioChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pie Chart -->
+        <div class="col-md-6">
+            <div class="card glow-effect">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-chart-pie"></i> Portfolio Distribution</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="portfolioPieChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Gainers/Losers -->
+    <div class="card mb-4 glow-effect">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-trophy"></i> Top Movers (24h)</h3>
+        </div>
+        <div class="card-body table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Coin</th>
+                        <th>Price (USD)</th>
+                        <th>24h Change</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for coin_id, data in market_data.items|dictsort:"usd_24h_change"|slice:"-5:" %}
+                        <tr>
+                            <td>{{ coin_id|capitalize_value }}</td>
+                            <td>${{ data.usd|format_currency }}</td>
+                            <td class="{% if data.usd_24h_change >= 0 %}positive{% else %}negative{% endif %}">
+                                {% if data.usd_24h_change >= 0 %}▲{% else %}▼{% endif %}
+                                {{ data.usd_24h_change|abs_value|floatformat:2 }}%
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Charts JS -->
+<script>
+    const chartData = {{ chart_data|default:"{'labels': [], 'values': []}"|safe }};
+    const portfolioLabels = {{ portfolio_labels|default:"[]"|safe }};
+    const portfolioValues = {{ portfolio_values|default:"[]"|safe }};
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Line Chart
+        const ctxLine = document.getElementById('portfolioChart').getContext('2d');
+        new Chart(ctxLine, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'Portfolio Value (USD)',
+                    data: chartData.values,
+                    borderColor: '#00d4ff',
+                    backgroundColor: 'rgba(0,212,255,0.1)',
+                    tension: 0.4,
+                    borderWidth: 2,
+                    pointRadius: 4
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } } }
+        });
+
+        // Pie Chart
+        const ctxPie = document.getElementById('portfolioPieChart').getContext('2d');
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: portfolioLabels,
+                datasets: [{
+                    data: portfolioValues,
+                    backgroundColor: ['#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF','#FF9F40','#00d4ff','#ff6b6b'],
+                    borderColor: '#fff', borderWidth: 1
+                }]
+            },
+            options: { responsive: true }
+        });
+    });
+</script>
+
+<!-- Live Ticker CSS -->
+<style>
+    .ticker-container { overflow: hidden; background: #0e1a2b; padding: 10px; border-radius: 10px; color: #fff; }
+    .ticker { display: flex; animation: scroll 25s linear infinite; }
+    .ticker-item { margin-right: 50px; white-space: nowrap; font-weight: bold; }
+    @keyframes scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+    .positive { color: #00ff85; }
+    .negative { color: #ff4b5c; }
+    .glow-effect { box-shadow: 0 0 15px rgba(0,212,255,0.3); }
+    .pulse { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+</style>
+{% endblock %}

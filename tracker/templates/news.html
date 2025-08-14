@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load format_filters %}
+
+{% block title %}Market News - Crypto Tracker{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">
+            <i class="bi bi-newspaper"></i> Cryptocurrency News
+        </h2>
+        <span class="badge bg-gradient text-light px-3 py-2 shadow-sm">Live Updates</span>
+    </div>
+
+    {% if news_data %}
+        <div class="list-group shadow-lg rounded-4 overflow-hidden">
+            {% for article in news_data %}
+                <a href="{{ article.url }}" 
+                   class="list-group-item list-group-item-action news-card" 
+                   target="_blank" 
+                   rel="noopener noreferrer">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1 fw-bold text-dark">{{ article.title }}</h5>
+                        <small class="text-muted">
+                            {{ article.published_at|date:"Y-m-d" }}
+                        </small>
+                    </div>
+                    <p class="mb-1 text-secondary">
+                        <i class="bi bi-globe2"></i> {{ article.source }}
+                    </p>
+                    <small class="text-muted">
+                        {{ article.description|truncatewords:30 }}
+                    </small>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info glow-effect text-center fs-5 py-4">
+            <i class="bi bi-info-circle-fill"></i> No news available at the moment.
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    /* Smooth hover effect for cards */
+    .news-card {
+        background: white;
+        transition: all 0.25s ease-in-out;
+        border-left: 5px solid transparent;
+    }
+    .news-card:hover {
+        background: #f8f9fa;
+        transform: translateY(-2px) scale(1.01);
+        border-left: 5px solid #0dcaf0;
+        box-shadow: 0 5px 15px rgba(13, 202, 240, 0.2);
+    }
+    /* Glow effect for info alert */
+    .glow-effect {
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+        border-radius: 10px;
+    }
+    /* Badge gradient */
+    .bg-gradient {
+        background: linear-gradient(135deg, #0dcaf0, #0d6efd);
+    }
+</style>
+{% endblock %}
