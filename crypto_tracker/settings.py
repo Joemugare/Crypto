@@ -11,7 +11,13 @@ COINGECKO_API_KEY = env('COINGECKO_API_KEY', default='')
 
 SECRET_KEY = 'django-insecure-dkp=mo(0wx+1n_ayw_!+ihyxe34!)_xu@fe(aju3j33aef=lj4'
 DEBUG = True
-ALLOWED_HOSTS = ['localhost', '127.0.0.1','cryptomonitor.live']
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'cryptomonitor.live',
+    'crypto-ijco.onrender.com'
+]
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -94,4 +100,5 @@ CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 LOGOUT_REDIRECT_URL = '/'
+
 
