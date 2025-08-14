@@ -31,5 +31,7 @@ COPY . .
 EXPOSE 8000
 
 # Run gunicorn
-CMD ["gunicorn", "cryto_tracker.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "crypto_tracker.wsgi:application", "--bind", "0.0.0.0:8000"]
+
+
 
