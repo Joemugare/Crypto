@@ -1,4 +1,3 @@
-# tracker/views.py
 from decimal import Decimal
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -14,13 +13,24 @@ from .utils import fetch_market_data, fetch_news, fetch_sentiment
 def home(request):
     try:
         market_data = cache.get('market_data') or fetch_market_data() or {}
-        cache.set('market_data', market_data, timeout=300)
+        # Pre-format coin names to bypass capitalize_value filter
+        formatted_data = {}
+        for coin_id, data in market_data.items():
+            formatted_data[coin_id] = {
+                'usd': data['usd'],
+                'usd_24h_change': data['usd_24h_change'],
+                'volume_24h': data['volume_24h'],
+                'sentiment': data.get('sentiment', 'Neutral'),
+                'name': ' '.join(word.capitalize() for word in coin_id.replace('_', ' ').split())
+            }
+        cache.set('market_data', formatted_data, timeout=300)
+        print("market_data:", formatted_data)  # Debug print
     except Exception as e:
-        market_data = {}
+        formatted_data = {}
         messages.error(request, "Failed to fetch market data. Please try again later.")
     return render(request, "home.html", {
-        "market_data": market_data,
-        "is_data_live": bool(market_data)
+        "market_data": formatted_data,
+        "is_data_live": bool(formatted_data)
     })
 
 @login_required
@@ -269,3 +279,17 @@ def market_data_api(request):
     except Exception:
         response = {"market_data": {}, "sentiment": {"score": 0.5, "label": "Neutral"}}
     return JsonResponse(response)
+
+@login_required
+def alerts_api(request):
+    try:
+        alerts_qs = Alert.objects.filter(user=request.user)
+        alerts_data = [{
+            "cryptocurrency": alert.cryptocurrency,
+            "target_price": float(alert.target_price),
+            "condition": alert.condition,
+            "created_at": alert.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        } for alert in alerts_qs]
+        return JsonResponse({"alerts": alerts_data})
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

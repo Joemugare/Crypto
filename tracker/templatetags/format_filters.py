@@ -1,6 +1,8 @@
 from django import template
 import builtins
 
+print("Loading format_filters.py")
+
 register = template.Library()
 
 @register.filter
@@ -23,9 +25,9 @@ def format_number(value):
 @register.filter
 def format_currency(value):
     try:
-        return f"{float(value):,.2f}"
+        return f"${float(value):,.2f}"
     except (ValueError, TypeError):
-        return "0.00"
+        return "$0.00"
 
 @register.filter
 def abs_value(value):
@@ -43,8 +45,7 @@ def lookup(dictionary, key):
 
 @register.filter
 def capitalize_value(value):
-    """Capitalizes the first letter of a string."""
     try:
-        return str(value).capitalize()
+        return ' '.join(word.capitalize() for word in str(value).replace('_', ' ').split())
     except (ValueError, TypeError):
         return ''

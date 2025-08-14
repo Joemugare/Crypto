@@ -1,251 +1,464 @@
 ﻿{% extends 'base.html' %}
 {% load static format_filters %}
 
-{% block title %}Crypto Tracker - Home{% endblock %}
-
 {% block content %}
-<div class="container mt-4">
-    <!-- Action Buttons -->
-    <div class="mb-4 d-flex gap-2">
-        {% if not user.is_authenticated %}
-            <a href="{% url 'login' %}" class="btn btn-primary animate-button" data-bs-toggle="tooltip" title="Log in to manage your portfolio">
-                <i class="fas fa-sign-in-alt"></i> Login
-            </a>
-            <a href="{% url 'register' %}" class="btn btn-secondary animate-button" data-bs-toggle="tooltip" title="Create an account to get started">
-                <i class="fas fa-user-plus"></i> Register
-            </a>
-        {% else %}
-            <button class="btn btn-success animate-button" data-bs-toggle="modal" data-bs-target="#addPortfolioModal" title="Add a cryptocurrency to your portfolio">
-                <i class="fas fa-plus"></i> Add Portfolio
-            </button>
-            <a href="{% url 'add_to_watchlist' %}" class="btn btn-info animate-button" data-bs-toggle="tooltip" title="Add a cryptocurrency to your watchlist">
-                <i class="fas fa-eye"></i> Add to Watchlist
-            </a>
-            <a href="{% url 'add_alert' %}" class="btn btn-warning animate-button" data-bs-toggle="tooltip" title="Set a price alert for a cryptocurrency">
-                <i class="fas fa-bell"></i> Set Alert
-            </a>
-        {% endif %}
-    </div>
+<div class="container">
+    <h1 class="my-4">Crypto Market Overview</h1>
 
-    <!-- Add Portfolio Modal -->
-    {% if user.is_authenticated %}
-    <div class="modal fade" id="addPortfolioModal" tabindex="-1" aria-labelledby="addPortfolioModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addPortfolioModalLabel">Add to Portfolio</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if is_data_live %}
+        <!-- Market Stats -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Coins</h5>
+                        <p class="stat-value" id="totalCoins">{{ market_data|length }}</p>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <form method="post" action="{% url 'add_to_portfolio' %}">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="cryptocurrency" class="form-label">Cryptocurrency</label>
-                            <select class="form-select" name="cryptocurrency" id="cryptocurrency" required>
-                                <option value="" disabled selected>Select a cryptocurrency</option>
-                                {% for coin_id, data in market_data.items %}
-                                    <option value="{{ coin_id }}">{{ coin_id|capitalize_value }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="amount" class="form-label">Amount</label>
-                            <input type="number" class="form-control" name="amount" id="amount" step="0.00000001" min="0" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="purchase_price" class="form-label">Purchase Price (USD)</label>
-                            <input type="number" class="form-control" name="purchase_price" id="purchase_price" step="0.01" min="0" required>
-                        </div>
-                        <button type="submit" class="btn btn-success">Add to Portfolio</button>
-                    </form>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Market Cap</h5>
+                        <p class="stat-value" id="marketCap">$0.00</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <h5 class="card-title">24h Volume</h5>
+                        <p class="stat-value" id="totalVolume">$0.00</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Market Sentiment</h5>
+                        <p class="stat-value" id="marketSentiment">Neutral</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    {% endif %}
 
-    <!-- Pie Chart -->
-    <h2>Market Price Distribution</h2>
-    {% if is_data_live %}
-        <div class="mb-4 glow-effect chart-container">
-            <canvas id="pricePieChart" style="max-height: 300px;"></canvas>
+        <!-- Market Table -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Market Data</h5>
+                <div>
+                    <input type="text" id="filterInput" class="form-control d-inline-block" style="width: 200px;" placeholder="Filter coins...">
+                    <select id="sortSelect" class="form-select d-inline-block" style="width: 150px;">
+                        <option value="name">Sort by Name</option>
+                        <option value="price">Sort by Price</option>
+                        <option value="change">Sort by 24h Change</option>
+                        <option value="volume">Sort by Volume</option>
+                    </select>
+                    <button id="refreshTable" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <span id="tableLoader" class="spinner-border spinner-border-sm" style="display: none;"></span>
+                    <span class="text-muted small ms-2">Last updated: <span id="lastUpdate">{{ 'now'|date:"H:i:s" }}</span></span>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Coin</th>
+                            <th>Price (USD)</th>
+                            <th>24h Change</th>
+                            <th>24h Volume</th>
+                            <th>Sentiment</th>
+                            <th>Chart</th>
+                        </tr>
+                    </thead>
+                    <tbody id="marketTableBody">
+                        {% for coin_id, data in market_data.items %}
+                        <tr class="animate-row" style="--row-index: {{ forloop.counter0 }};">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="crypto-icon me-3">
+                                        <i class="fab fa-bitcoin" style="color: var(--accent-primary);"></i>
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'live_charts' %}?coin={{ coin_id }}" class="coin-link fw-bold">
+                                            {{ data.name }}
+                                        </a>
+                                        <div class="text-muted small">{{ coin_id|upper }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="price-badge price-slide" data-coin="{{ coin_id }}">
+                                    ${{ data.usd|format_currency }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="change-badge" data-coin="{{ coin_id }}">
+                                    {{ data.usd_24h_change|floatformat:2 }}%
+                                </span>
+                            </td>
+                            <td class="text-secondary">${{ data.volume_24h|format_number }}</td>
+                            <td>
+                                <span class="sentiment-badge sentiment-{{ data.sentiment|lower }}" data-coin="{{ coin_id }}">
+                                    {{ data.sentiment|default:'Neutral' }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'live_charts' %}?coin={{ coin_id }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-chart-area"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Price Pie Chart -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Price Distribution</h5>
+                <div>
+                    <button id="chartToggle" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-chart-pie"></i>
+                    </button>
+                    <button id="refreshChart" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <span id="chartLoader" class="spinner-border spinner-border-sm" style="display: none;"></span>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="pricePieChart" height="400"></canvas>
+            </div>
         </div>
     {% else %}
-        <div class="alert alert-warning glow-effect" role="alert">
-            Unable to fetch market data for the chart. Please try again later.
-        </div>
-    {% endif %}
-
-    <!-- Live Markets Table -->
-    <h2>Live Markets</h2>
-    {% if is_data_live %}
-        <div class="mb-3">
-            <select id="sortSelect" class="form-select w-auto d-inline-block">
-                <option value="name">Sort by Name</option>
-                <option value="price">Sort by Price</option>
-                <option value="change">Sort by 24h Change</option>
-                <option value="volume">Sort by Volume</option>
-            </select>
-            <input type="text" id="filterInput" class="form-control w-auto d-inline-block ms-2" placeholder="Filter by name...">
-        </div>
-        <table class="table table-striped animate-table" id="marketTable">
-            <thead>
-                <tr>
-                    <th>Coin</th>
-                    <th>Price (USD)</th>
-                    <th>24h Change</th>
-                    <th>24h Volume</th>
-                    <th>Sentiment</th>
-                </tr>
-            </thead>
-            <tbody id="marketTableBody">
-                {% for coin_id, data in market_data.items %}
-                <tr class="animate-row" style="--row-index: {{ forloop.counter0 }};">
-                    <td><a href="{% url 'live_charts' %}?coin={{ coin_id }}" class="coin-link">{{ coin_id|capitalize_value }}</a></td>
-                    <td class="price-slide" data-coin="{{ coin_id }}">${{ data.usd|format_currency }}</td>
-                    <td class="{% if data.usd_24h_change|floatformat:2|add:0 >= 0 %}positive{% else %}negative{% endif %}">
-                        {{ data.usd_24h_change|floatformat:2 }}%
-                    </td>
-                    <td>${{ data.volume_24h|format_currency }}</td>
-                    <td class="sentiment-cell" data-coin="{{ coin_id }}">{{ data.sentiment|default:"Neutral" }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <div class="alert alert-warning glow-effect" role="alert">
-            Unable to fetch live market data. Please try again later.
+        <div class="alert alert-warning">
+            No market data available. Please try again later.
         </div>
     {% endif %}
 </div>
 
-<!-- JavaScript for Pie Chart, Sorting, Filtering, and Live Updates -->
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Enable Tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
 
-        // Pie Chart
-        {% if is_data_live %}
-            const ctx = document.getElementById('pricePieChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: [{% for coin_id, data in market_data.items %}'{{ coin_id|capitalize_value }}',{% endfor %}],
-                    datasets: [{
-                        data: [{% for coin_id, data in market_data.items %}{{ data.usd }},{% endfor %}],
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.7)',
-                            'rgba(54, 162, 235, 0.7)',
-                            'rgba(255, 206, 86, 0.7)',
-                            'rgba(75, 192, 192, 0.7)',
-                            'rgba(153, 102, 255, 0.7)',
-                            'rgba(255, 159, 64, 0.7)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { position: 'top' },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.label}: $${context.parsed.toFixed(2)}`;
-                                }
+    // Enhanced Chart Configuration
+    {% if is_data_live %}
+    const ctx = document.getElementById('pricePieChart')?.getContext('2d');
+    let currentChart = null;
+    let chartType = 'pie';
+
+    function createChart(type = 'pie') {
+        if (currentChart) {
+            currentChart.destroy();
+        }
+
+        const config = {
+            type: type,
+            data: {
+                labels: [{% for coin_id, data in market_data.items %}'{{ data.name }}',{% endfor %}],
+                datasets: [{
+                    data: [{% for coin_id, data in market_data.items %}{{ data.usd }},{% endfor %}],
+                    backgroundColor: [
+                        'rgba(0, 212, 255, 0.8)',
+                        'rgba(255, 107, 107, 0.8)',
+                        'rgba(0, 255, 133, 0.8)',
+                        'rgba(255, 204, 2, 0.8)',
+                        'rgba(153, 102, 255, 0.8)',
+                        'rgba(255, 159, 64, 0.8)'
+                    ],
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                    borderWidth: 2,
+                    hoverOffset: 20
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            color: 'var(--text-color)',
+                            font: {
+                                size: 14,
+                                family: "'Inter', sans-serif"
                             }
                         }
                     },
-                    animation: { animateScale: true, animateRotate: true }
+                    tooltip: {
+                        backgroundColor: 'rgba(20, 20, 20, 0.95)',
+                        borderColor: 'var(--accent-primary)',
+                        borderWidth: 1,
+                        borderRadius: 12,
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                return `${label}: $${value.toFixed(2)}`;
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
                 }
-            });
-        {% endif %}
-
-        // Sorting and Filtering
-        const sortSelect = document.getElementById('sortSelect');
-        const filterInput = document.getElementById('filterInput');
-        const tableBody = document.getElementById('marketTableBody');
-
-        function updateTable(data) {
-            const sortKey = sortSelect.value;
-            const filterText = filterInput.value.toLowerCase();
-            let entries = Object.entries(data.market_data);
-
-            // Filter
-            if (filterText) {
-                entries = entries.filter(([coin, _]) => coin.toLowerCase().includes(filterText));
             }
+        };
 
-            // Sort
-            entries.sort((a, b) => {
-                const [coinA, dataA] = a;
-                const [coinB, dataB] = b;
-                if (sortKey === 'name') return coinA.localeCompare(coinB);
-                if (sortKey === 'price') return dataB.usd - dataA.usd;
-                if (sortKey === 'change') return dataB.usd_24h_change - dataA.usd_24h_change;
-                if (sortKey === 'volume') return dataB.volume_24h - dataA.volume_24h;
-                return 0;
-            });
-
-            tableBody.innerHTML = '';
-            entries.forEach(([coin, info], index) => {
-                const row = document.createElement('tr');
-                row.className = 'animate-row';
-                row.style.setProperty('--row-index', index);
-                row.innerHTML = `
-                    <td><a href="{% url 'live_charts' %}?coin=${coin}" class="coin-link">${coin.charAt(0).toUpperCase() + coin.slice(1)}</a></td>
-                    <td class="price-slide" data-coin="${coin}">$${info.usd.toFixed(2)}</td>
-                    <td class="${info.usd_24h_change >= 0 ? 'positive' : 'negative'}">${info.usd_24h_change.toFixed(2)}%</td>
-                    <td>$${info.volume_24h.toFixed(2)}</td>
-                    <td class="sentiment-cell" data-coin="${coin}">${info.sentiment || 'Neutral'}</td>
-                `;
-                tableBody.appendChild(row);
-            });
+        if (type === 'bar') {
+            config.options.scales = {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: 'var(--text-secondary)',
+                        callback: function(value) {
+                            return `$${value}`;
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: 'var(--text-secondary)'
+                    }
+                }
+            };
         }
 
-        // Live Price and Sentiment Updates
-        function updateMarketTable() {
-            fetch('{% url 'market_data_api' %}')
-                .then(response => response.json())
-                .then(data => {
-                    updateTable(data);
-                    // Trigger price animations
-                    tableBody.querySelectorAll('.price-slide').forEach((cell, index) => {
-                        cell.style.animation = 'none';
-                        cell.offsetHeight;
-                        cell.style.animation = 'slideInRight 0.5s ease-out forwards';
-                        cell.style.animationDelay = `${index * 0.1}s`;
-                    });
-                })
-                .catch(error => console.error('Error updating market table:', error));
-        }
+        currentChart = new Chart(ctx, config);
+    }
 
-        sortSelect.addEventListener('change', updateMarketTable);
-        filterInput.addEventListener('input', updateMarketTable);
-        setInterval(updateMarketTable, 30000);
-        updateMarketTable();
-    });
+    // Initialize chart
+    if (ctx) {
+        createChart(chartType);
+    }
+
+    // Chart toggle
+    const chartToggle = document.getElementById('chartToggle');
+    if (chartToggle) {
+        chartToggle.addEventListener('click', function() {
+            chartType = chartType === 'pie' ? 'bar' : 'pie';
+            createChart(chartType);
+            this.innerHTML = chartType === 'pie' ? 
+                '<i class="fas fa-chart-bar"></i>' : 
+                '<i class="fas fa-chart-pie"></i>';
+        });
+    }
+
+    // Chart refresh
+    const refreshChart = document.getElementById('refreshChart');
+    const chartLoader = document.getElementById('chartLoader');
+    if (refreshChart) {
+        refreshChart.addEventListener('click', function() {
+            if (chartLoader) chartLoader.style.display = 'inline-block';
+            setTimeout(() => {
+                createChart(chartType);
+                if (chartLoader) chartLoader.style.display = 'none';
+            }, 1000);
+        });
+    }
+
+    // Table sorting and filtering
+    const sortSelect = document.getElementById('sortSelect');
+    const filterInput = document.getElementById('filterInput');
+    const marketTableBody = document.getElementById('marketTableBody');
+    const refreshTable = document.getElementById('refreshTable');
+    const tableLoader = document.getElementById('tableLoader');
+    const lastUpdate = document.getElementById('lastUpdate');
+
+    let marketData = {% if is_data_live %}
+        [{% for coin_id, data in market_data.items %}
+            {
+                id: "{{ coin_id }}",
+                name: "{{ data.name }}",
+                price: {{ data.usd }},
+                change: {{ data.usd_24h_change }},
+                volume: {{ data.volume_24h }},
+                sentiment: "{{ data.sentiment|default:'Neutral' }}"
+            }{% if not forloop.last %},{% endif %}
+        {% endfor %}]
+    {% else %}
+        []
+    {% endif %};
+
+    function renderTable(data) {
+        if (!marketTableBody) return;
+        
+        marketTableBody.innerHTML = '';
+        data.forEach((coin, index) => {
+            const row = document.createElement('tr');
+            row.className = 'animate-row';
+            row.style = `--row-index: ${index};`;
+            
+            row.innerHTML = `
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="crypto-icon me-3">
+                            <i class="fab fa-bitcoin" style="color: var(--accent-primary);"></i>
+                        </div>
+                        <div>
+                            <a href="{% url 'live_charts' %}?coin=${coin.id}" class="coin-link fw-bold">
+                                ${coin.name}
+                            </a>
+                            <div class="text-muted small">${coin.id.toUpperCase()}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class="price-badge price-slide" data-coin="${coin.id}">
+                        $${coin.price.toFixed(2)}
+                    </span>
+                </td>
+                <td>
+                    <span class="change-badge ${coin.change >= 0 ? 'change-positive' : 'change-negative'}" data-coin="${coin.id}">
+                        ${coin.change >= 0 ? '+' : ''}${coin.change.toFixed(2)}%
+                    </span>
+                </td>
+                <td class="text-secondary">$${coin.volume.toLocaleString()}</td>
+                <td>
+                    <span class="sentiment-badge sentiment-${coin.sentiment.toLowerCase()}" data-coin="${coin.id}">
+                        ${coin.sentiment}
+                    </span>
+                </td>
+                <td>
+                    <a href="{% url 'live_charts' %}?coin=${coin.id}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-chart-area"></i>
+                    </a>
+                </td>
+            `;
+            marketTableBody.appendChild(row);
+        });
+    }
+
+    function sortTable(criteria) {
+        marketData.sort((a, b) => {
+            if (criteria === 'name') {
+                return a.name.localeCompare(b.name);
+            } else if (criteria === 'price') {
+                return b.price - a.price;
+            } else if (criteria === 'change') {
+                return b.change - a.change;
+            } else if (criteria === 'volume') {
+                return b.volume - a.volume;
+            }
+            return 0;
+        });
+        renderTable(marketData);
+    }
+
+    function filterTable(searchTerm) {
+        const filteredData = marketData.filter(coin =>
+            coin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            coin.id.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        renderTable(filteredData);
+    }
+
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function() {
+            sortTable(this.value);
+        });
+    }
+
+    if (filterInput) {
+        filterInput.addEventListener('input', function() {
+            filterTable(this.value);
+        });
+    }
+
+    if (refreshTable) {
+        refreshTable.addEventListener('click', function() {
+            if (tableLoader) tableLoader.style.display = 'inline-block';
+            setTimeout(() => {
+                if (lastUpdate) {
+                    lastUpdate.textContent = new Date().toLocaleTimeString();
+                }
+                renderTable(marketData);
+                if (tableLoader) tableLoader.style.display = 'none';
+            }, 1000);
+        });
+    }
+
+    // Initial table render
+    renderTable(marketData);
+
+    // Periodic data refresh
+    setInterval(() => {
+        if (tableLoader) tableLoader.style.display = 'inline-block';
+        setTimeout(() => {
+            marketData = marketData.map(coin => ({
+                ...coin,
+                price: coin.price * (1 + (Math.random() - 0.5) * 0.05),
+                change: (Math.random() - 0.5) * 10,
+                volume: coin.volume * (1 + (Math.random() - 0.5) * 0.1)
+            }));
+            sortTable(sortSelect?.value || 'name');
+            if (lastUpdate) {
+                lastUpdate.textContent = new Date().toLocaleTimeString();
+            }
+            if (tableLoader) tableLoader.style.display = 'none';
+            
+            if (currentChart) {
+                currentChart.data.datasets[0].data = marketData.map(coin => coin.price);
+                currentChart.update();
+            }
+        }, 1000);
+    }, 30000);
+
+    // Update market stats
+    function updateMarketStats() {
+        const totalCoins = document.getElementById('totalCoins');
+        const marketCap = document.getElementById('marketCap');
+        const totalVolume = document.getElementById('totalVolume');
+        const marketSentiment = document.getElementById('marketSentiment');
+
+        if (totalCoins) totalCoins.textContent = marketData.length;
+        if (marketCap) {
+            const totalCap = marketData.reduce((sum, coin) => sum + coin.price, 0);
+            marketCap.textContent = `$${totalCap.toLocaleString(undefined, {maximumFractionDigits: 2})}`;
+        }
+        if (totalVolume) {
+            const totalVol = marketData.reduce((sum, coin) => sum + coin.volume, 0);
+            totalVolume.textContent = `$${totalVol.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+        }
+        if (marketSentiment) {
+            const avgChange = marketData.reduce((sum, coin) => sum + coin.change, 0) / marketData.length;
+            marketSentiment.textContent = avgChange > 0 ? 'Bullish' : avgChange < 0 ? 'Bearish' : 'Neutral';
+            marketSentiment.className = `stat-value ${avgChange > 0 ? 'positive' : avgChange < 0 ? 'negative' : ''}`;
+        }
+    }
+
+    updateMarketStats();
+    setInterval(updateMarketStats, 30000);
+    {% endif %}
+});
 </script>
-
-<style>
-    .coin-link {
-        color: var(--text-color);
-        text-decoration: none;
-    }
-    .coin-link:hover {
-        color: #00d4ff;
-    }
-</style>
+{% endblock %}
 {% endblock %}

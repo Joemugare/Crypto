@@ -5,8 +5,14 @@
 
 {% block content %}
 <div class="container">
-
     <!-- Alerts -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} text-center glow-effect">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
     {% if not is_data_live %}
         <div class="alert alert-warning text-center glow-effect">
             Using fallback data due to API rate limits.
@@ -23,9 +29,12 @@
         <div class="ticker">
             {% for coin_id, data in market_data.items %}
                 <div class="ticker-item">
-                    {{ coin_id|capitalize_value }}: ${{ data.usd|format_currency }} 
-                    {% if data.usd_24h_change >= 0 %}<span class="positive">▲ {{ data.usd_24h_change|abs_value|floatformat:2 }}%</span>
-                    {% else %}<span class="negative">▼ {{ data.usd_24h_change|abs_value|floatformat:2 }}%</span>{% endif %}
+                    {{ data.name }}: ${{ data.usd|format_currency }}
+                    {% if data.usd_24h_change >= 0 %}
+                        <span class="positive">▲ {{ data.usd_24h_change|floatformat:2 }}%</span>
+                    {% else %}
+                        <span class="negative">▼ {{ data.usd_24h_change|floatformat:2 }}%</span>
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>
@@ -98,11 +107,11 @@
                 <tbody>
                     {% for coin_id, data in market_data.items|dictsort:"usd_24h_change"|slice:"-5:" %}
                         <tr>
-                            <td>{{ coin_id|capitalize_value }}</td>
+                            <td>{{ data.name }}</td>
                             <td>${{ data.usd|format_currency }}</td>
                             <td class="{% if data.usd_24h_change >= 0 %}positive{% else %}negative{% endif %}">
                                 {% if data.usd_24h_change >= 0 %}▲{% else %}▼{% endif %}
-                                {{ data.usd_24h_change|abs_value|floatformat:2 }}%
+                                {{ data.usd_24h_change|floatformat:2 }}%
                             </td>
                         </tr>
                     {% endfor %}
@@ -113,6 +122,7 @@
 </div>
 
 <!-- Charts JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const chartData = {{ chart_data|default:"{'labels': [], 'values': []}"|safe }};
     const portfolioLabels = {{ portfolio_labels|default:"[]"|safe }};

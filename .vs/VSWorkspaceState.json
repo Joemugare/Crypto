@@ -1,15 +1,15 @@
 {
   "ExpandedNodes": [
     "",
-    "\\static",
-    "\\staticfiles",
+    "\\crypto_tracker",
     "\\staticfiles\\css",
     "\\static\\js",
     "\\tracker",
     "\\tracker\\static",
     "\\tracker\\templates",
-    "\\tracker\\templates\\registration"
+    "\\tracker\\templates\\registration",
+    "\\tracker\\templatetags"
   ],
-  "SelectedNode": "\\tracker\\templates\\base.html",
+  "SelectedNode": "\\tracker\\templatetags\\format_filters.py",
   "PreviewInSolutionExplorer": false
 }
