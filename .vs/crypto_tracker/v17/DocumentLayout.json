@@ -3,6 +3,26 @@
   "WorkspaceRootPath": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\base.html||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\templates\\base.html||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\crypto_tracker\\settings.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:crypto_tracker\\settings.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\portfolio.html||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\templates\\portfolio.html||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\crypto_tracker\\urls.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:crypto_tracker\\urls.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\static\\images\\favicon.ico||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\static\\images\\favicon.ico||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\urls.py||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\urls.py||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
@@ -13,14 +33,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\dashboard.html||{3B902123-F8A7-4915-9F01-361F908088D0}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\templates\\dashboard.html||{3B902123-F8A7-4915-9F01-361F908088D0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\base.html||{3B902123-F8A7-4915-9F01-361F908088D0}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\templates\\base.html||{3B902123-F8A7-4915-9F01-361F908088D0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\crypto_tracker\\settings.py||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:crypto_tracker\\settings.py||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templatetags\\format_filters.py||{8B382828-6202-11D1-8870-0000F87579D2}",
@@ -103,10 +115,6 @@
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\templates\\profile.html||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\crypto_tracker\\urls.py||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:crypto_tracker\\urls.py||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\registration\\login.html||{3B902123-F8A7-4915-9F01-361F908088D0}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\templates\\registration\\login.html||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
@@ -125,10 +133,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\watchlist.html||{3B902123-F8A7-4915-9F01-361F908088D0}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\templates\\watchlist.html||{3B902123-F8A7-4915-9F01-361F908088D0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\portfolio.html||{3B902123-F8A7-4915-9F01-361F908088D0}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tracker\\templates\\portfolio.html||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\.env||{8B382828-6202-11D1-8870-0000F87579D2}",
@@ -182,7 +186,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 9,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Bookmark",
@@ -190,59 +194,108 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "style.css",
-              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\static\\css\\style.css",
-              "RelativeDocumentMoniker": "static\\css\\style.css",
-              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\static\\css\\style.css",
-              "RelativeToolTip": "static\\css\\style.css",
-              "ViewState": "AQIAAJkAAAAAAAAAAAAgwK8AAAABAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2025-08-14T11:39:25.307Z",
+              "DocumentIndex": 4,
+              "Title": "favicon.ico",
+              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\static\\images\\favicon.ico",
+              "RelativeDocumentMoniker": "tracker\\static\\images\\favicon.ico",
+              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\static\\images\\favicon.ico",
+              "RelativeToolTip": "tracker\\static\\images\\favicon.ico",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001525|",
+              "WhenOpened": "2025-08-14T20:45:49.747Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 6,
+              "Title": "views.py",
+              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\views.py",
+              "RelativeDocumentMoniker": "tracker\\views.py",
+              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\views.py",
+              "RelativeToolTip": "tracker\\views.py",
+              "ViewState": "AQIAABMBAAAAAAAAAAAqwCgBAAAAAAAA",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHeSURBVDhPpVMxa1NRFP7ebZLSlgaltNpSVCySRUxL0NAh4FJpHWpxcZAUBEPG/AKHDsVBN5eGrCnoYKCDoDiUCKKBjtZBUZtJ2ojYJr40ue\u002B\u002B47k3VzD0hQr94OOed8853/k47z2cCETk2NAgk8mQDQMhhFjK5/Mb9vEotIDruoEsFovEzVvZbPaWLTcQ9uxCpVLp4l\u002Bk0\u002BlEPB5/wIPm7RVC9uxCMpm0UTdKpRKi0WiCQy3wUt8FCvw7VSNxbRapG4voDwucGgyjXC7bzH84ePt1HysbH/GhWoNstzA1OoSFhZuxQqFg8sfu4FutAd\u002BT8KSEYm7v7GJ0YnLClgYLaAcjU9N4Vx9Dda8OBz7OjwywSNsIXY39vEL7TxWpxv2eO3hWHUZ19xc8ti25UdvXzdpNWH0BDj8JiLOrPXfweOu9mRgRhOXUEPr7IiBfYeacB9HaBNRvQH4f6\u002BlgMERwGxJP7grEoq9shj9Uz\u002BVGpmIi4vXcwdzlcePgzLAuZPiSGw869Jg\u002Biw1Mvw50oLGcuoh71y8h1HwB1Js8UfFLnwScNnBhdYVLWsy1IwK5XM5GHaw9uu0LeSCMddZA32lz7zjOQxMcByK1SPU3O/Rjnai2fkjNz8/5L77TyQJ/AJc67LNf3QeWAAAAAElFTkSuQmCC",
+              "WhenOpened": "2025-08-14T11:43:04.965Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "settings.py",
+              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\crypto_tracker\\settings.py",
+              "RelativeDocumentMoniker": "crypto_tracker\\settings.py",
+              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\crypto_tracker\\settings.py",
+              "RelativeToolTip": "crypto_tracker\\settings.py",
+              "ViewState": "AQIAAGYAAAAAAAAAAAAAAHAAAAA0AAAA",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHeSURBVDhPpVMxa1NRFP7ebZLSlgaltNpSVCySRUxL0NAh4FJpHWpxcZAUBEPG/AKHDsVBN5eGrCnoYKCDoDiUCKKBjtZBUZtJ2ojYJr40ue\u002B\u002B47k3VzD0hQr94OOed8853/k47z2cCETk2NAgk8mQDQMhhFjK5/Mb9vEotIDruoEsFovEzVvZbPaWLTcQ9uxCpVLp4l\u002Bk0\u002BlEPB5/wIPm7RVC9uxCMpm0UTdKpRKi0WiCQy3wUt8FCvw7VSNxbRapG4voDwucGgyjXC7bzH84ePt1HysbH/GhWoNstzA1OoSFhZuxQqFg8sfu4FutAd\u002BT8KSEYm7v7GJ0YnLClgYLaAcjU9N4Vx9Dda8OBz7OjwywSNsIXY39vEL7TxWpxv2eO3hWHUZ19xc8ti25UdvXzdpNWH0BDj8JiLOrPXfweOu9mRgRhOXUEPr7IiBfYeacB9HaBNRvQH4f6\u002BlgMERwGxJP7grEoq9shj9Uz\u002BVGpmIi4vXcwdzlcePgzLAuZPiSGw869Jg\u002Biw1Mvw50oLGcuoh71y8h1HwB1Js8UfFLnwScNnBhdYVLWsy1IwK5XM5GHaw9uu0LeSCMddZA32lz7zjOQxMcByK1SPU3O/Rjnai2fkjNz8/5L77TyQJ/AJc67LNf3QeWAAAAAElFTkSuQmCC",
+              "WhenOpened": "2025-08-14T11:29:47.286Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "dashboard.html",
+              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\dashboard.html",
+              "RelativeDocumentMoniker": "tracker\\templates\\dashboard.html",
+              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\dashboard.html",
+              "RelativeToolTip": "tracker\\templates\\dashboard.html",
+              "ViewState": "AQIAAJ0AAAAAAAAAAAAgwLMAAAAOAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2025-08-14T11:41:01.61Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "urls.py",
+              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\urls.py",
+              "RelativeDocumentMoniker": "tracker\\urls.py",
+              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\urls.py",
+              "RelativeToolTip": "tracker\\urls.py",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABoAAAAEAAAA",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHeSURBVDhPpVMxa1NRFP7ebZLSlgaltNpSVCySRUxL0NAh4FJpHWpxcZAUBEPG/AKHDsVBN5eGrCnoYKCDoDiUCKKBjtZBUZtJ2ojYJr40ue\u002B\u002B47k3VzD0hQr94OOed8853/k47z2cCETk2NAgk8mQDQMhhFjK5/Mb9vEotIDruoEsFovEzVvZbPaWLTcQ9uxCpVLp4l\u002Bk0\u002BlEPB5/wIPm7RVC9uxCMpm0UTdKpRKi0WiCQy3wUt8FCvw7VSNxbRapG4voDwucGgyjXC7bzH84ePt1HysbH/GhWoNstzA1OoSFhZuxQqFg8sfu4FutAd\u002BT8KSEYm7v7GJ0YnLClgYLaAcjU9N4Vx9Dda8OBz7OjwywSNsIXY39vEL7TxWpxv2eO3hWHUZ19xc8ti25UdvXzdpNWH0BDj8JiLOrPXfweOu9mRgRhOXUEPr7IiBfYeacB9HaBNRvQH4f6\u002BlgMERwGxJP7grEoq9shj9Uz\u002BVGpmIi4vXcwdzlcePgzLAuZPiSGw869Jg\u002Biw1Mvw50oLGcuoh71y8h1HwB1Js8UfFLnwScNnBhdYVLWsy1IwK5XM5GHaw9uu0LeSCMddZA32lz7zjOQxMcByK1SPU3O/Rjnai2fkjNz8/5L77TyQJ/AJc67LNf3QeWAAAAAElFTkSuQmCC",
+              "WhenOpened": "2025-08-14T11:43:37.021Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
               "Title": "base.html",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\base.html",
               "RelativeDocumentMoniker": "tracker\\templates\\base.html",
               "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\base.html",
               "RelativeToolTip": "tracker\\templates\\base.html",
-              "ViewState": "AQIAAPcAAAAAAAAAAAAgwA0BAAAHAAAA",
+              "ViewState": "AQIAAPwAAAAAAAAAAAAgwBIBAAAHAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
               "WhenOpened": "2025-08-14T11:40:42.799Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "style.css",
-              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\staticfiles\\css\\style.css",
-              "RelativeDocumentMoniker": "staticfiles\\css\\style.css",
-              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\staticfiles\\css\\style.css",
-              "RelativeToolTip": "staticfiles\\css\\style.css",
-              "ViewState": "AQIAABcCAAAAAAAAAAAgwC0CAAABAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2025-08-14T14:20:47.917Z",
+              "DocumentIndex": 3,
+              "Title": "urls.py",
+              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\crypto_tracker\\urls.py",
+              "RelativeDocumentMoniker": "crypto_tracker\\urls.py",
+              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\crypto_tracker\\urls.py",
+              "RelativeToolTip": "crypto_tracker\\urls.py",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAAkAAAA",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHeSURBVDhPpVMxa1NRFP7ebZLSlgaltNpSVCySRUxL0NAh4FJpHWpxcZAUBEPG/AKHDsVBN5eGrCnoYKCDoDiUCKKBjtZBUZtJ2ojYJr40ue\u002B\u002B47k3VzD0hQr94OOed8853/k47z2cCETk2NAgk8mQDQMhhFjK5/Mb9vEotIDruoEsFovEzVvZbPaWLTcQ9uxCpVLp4l\u002Bk0\u002BlEPB5/wIPm7RVC9uxCMpm0UTdKpRKi0WiCQy3wUt8FCvw7VSNxbRapG4voDwucGgyjXC7bzH84ePt1HysbH/GhWoNstzA1OoSFhZuxQqFg8sfu4FutAd\u002BT8KSEYm7v7GJ0YnLClgYLaAcjU9N4Vx9Dda8OBz7OjwywSNsIXY39vEL7TxWpxv2eO3hWHUZ19xc8ti25UdvXzdpNWH0BDj8JiLOrPXfweOu9mRgRhOXUEPr7IiBfYeacB9HaBNRvQH4f6\u002BlgMERwGxJP7grEoq9shj9Uz\u002BVGpmIi4vXcwdzlcePgzLAuZPiSGw869Jg\u002Biw1Mvw50oLGcuoh71y8h1HwB1Js8UfFLnwScNnBhdYVLWsy1IwK5XM5GHaw9uu0LeSCMddZA32lz7zjOQxMcByK1SPU3O/Rjnai2fkjNz8/5L77TyQJ/AJc67LNf3QeWAAAAAElFTkSuQmCC",
+              "WhenOpened": "2025-08-14T11:44:01.007Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "home.html",
-              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\home.html",
-              "RelativeDocumentMoniker": "tracker\\templates\\home.html",
-              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\home.html",
-              "RelativeToolTip": "tracker\\templates\\home.html",
-              "ViewState": "AQIAALkBAAAAAAAAAAAgwM8BAAAOAAAA",
+              "DocumentIndex": 2,
+              "Title": "portfolio.html",
+              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\portfolio.html",
+              "RelativeDocumentMoniker": "tracker\\templates\\portfolio.html",
+              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\portfolio.html",
+              "RelativeToolTip": "tracker\\templates\\portfolio.html",
+              "ViewState": "AQIAAH8AAAAAAAAAAAAgwJUAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
-              "WhenOpened": "2025-08-14T13:48:03.084Z",
+              "WhenOpened": "2025-08-14T11:41:20.507Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 8,
               "Title": "format_filters.py",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templatetags\\format_filters.py",
               "RelativeDocumentMoniker": "tracker\\templatetags\\format_filters.py",
@@ -255,59 +308,45 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "views.py",
-              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\views.py",
-              "RelativeDocumentMoniker": "tracker\\views.py",
-              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\views.py",
-              "RelativeToolTip": "tracker\\views.py",
-              "ViewState": "AQIAABMBAAAAAAAAAAAqwCgBAAAAAAAA",
-              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHeSURBVDhPpVMxa1NRFP7ebZLSlgaltNpSVCySRUxL0NAh4FJpHWpxcZAUBEPG/AKHDsVBN5eGrCnoYKCDoDiUCKKBjtZBUZtJ2ojYJr40ue\u002B\u002B47k3VzD0hQr94OOed8853/k47z2cCETk2NAgk8mQDQMhhFjK5/Mb9vEotIDruoEsFovEzVvZbPaWLTcQ9uxCpVLp4l\u002Bk0\u002BlEPB5/wIPm7RVC9uxCMpm0UTdKpRKi0WiCQy3wUt8FCvw7VSNxbRapG4voDwucGgyjXC7bzH84ePt1HysbH/GhWoNstzA1OoSFhZuxQqFg8sfu4FutAd\u002BT8KSEYm7v7GJ0YnLClgYLaAcjU9N4Vx9Dda8OBz7OjwywSNsIXY39vEL7TxWpxv2eO3hWHUZ19xc8ti25UdvXzdpNWH0BDj8JiLOrPXfweOu9mRgRhOXUEPr7IiBfYeacB9HaBNRvQH4f6\u002BlgMERwGxJP7grEoq9shj9Uz\u002BVGpmIi4vXcwdzlcePgzLAuZPiSGw869Jg\u002Biw1Mvw50oLGcuoh71y8h1HwB1Js8UfFLnwScNnBhdYVLWsy1IwK5XM5GHaw9uu0LeSCMddZA32lz7zjOQxMcByK1SPU3O/Rjnai2fkjNz8/5L77TyQJ/AJc67LNf3QeWAAAAAElFTkSuQmCC",
-              "WhenOpened": "2025-08-14T11:43:04.965Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "settings.py",
-              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\crypto_tracker\\settings.py",
-              "RelativeDocumentMoniker": "crypto_tracker\\settings.py",
-              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\crypto_tracker\\settings.py",
-              "RelativeToolTip": "crypto_tracker\\settings.py",
-              "ViewState": "AQIAAAYAAAAAAAAAAAAAABQAAAAeAAAA",
-              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHeSURBVDhPpVMxa1NRFP7ebZLSlgaltNpSVCySRUxL0NAh4FJpHWpxcZAUBEPG/AKHDsVBN5eGrCnoYKCDoDiUCKKBjtZBUZtJ2ojYJr40ue\u002B\u002B47k3VzD0hQr94OOed8853/k47z2cCETk2NAgk8mQDQMhhFjK5/Mb9vEotIDruoEsFovEzVvZbPaWLTcQ9uxCpVLp4l\u002Bk0\u002BlEPB5/wIPm7RVC9uxCMpm0UTdKpRKi0WiCQy3wUt8FCvw7VSNxbRapG4voDwucGgyjXC7bzH84ePt1HysbH/GhWoNstzA1OoSFhZuxQqFg8sfu4FutAd\u002BT8KSEYm7v7GJ0YnLClgYLaAcjU9N4Vx9Dda8OBz7OjwywSNsIXY39vEL7TxWpxv2eO3hWHUZ19xc8ti25UdvXzdpNWH0BDj8JiLOrPXfweOu9mRgRhOXUEPr7IiBfYeacB9HaBNRvQH4f6\u002BlgMERwGxJP7grEoq9shj9Uz\u002BVGpmIi4vXcwdzlcePgzLAuZPiSGw869Jg\u002Biw1Mvw50oLGcuoh71y8h1HwB1Js8UfFLnwScNnBhdYVLWsy1IwK5XM5GHaw9uu0LeSCMddZA32lz7zjOQxMcByK1SPU3O/Rjnai2fkjNz8/5L77TyQJ/AJc67LNf3QeWAAAAAElFTkSuQmCC",
-              "WhenOpened": "2025-08-14T11:29:47.286Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "dashboard.html",
-              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\dashboard.html",
-              "RelativeDocumentMoniker": "tracker\\templates\\dashboard.html",
-              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\dashboard.html",
-              "RelativeToolTip": "tracker\\templates\\dashboard.html",
-              "ViewState": "AQIAAJ0AAAAAAAAAAAAgwLMAAAAOAAAA",
+              "DocumentIndex": 9,
+              "Title": "home.html",
+              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\home.html",
+              "RelativeDocumentMoniker": "tracker\\templates\\home.html",
+              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\home.html",
+              "RelativeToolTip": "tracker\\templates\\home.html",
+              "ViewState": "AQIAALkBAAAAAAAAAAAgwM8BAAAOAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
-              "WhenOpened": "2025-08-14T11:41:01.61Z",
+              "WhenOpened": "2025-08-14T13:48:03.084Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "urls.py",
-              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\urls.py",
-              "RelativeDocumentMoniker": "tracker\\urls.py",
-              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\urls.py",
-              "RelativeToolTip": "tracker\\urls.py",
-              "ViewState": "AQIAAAcAAAAAAAAAAAAqwBoAAAAEAAAA",
-              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHeSURBVDhPpVMxa1NRFP7ebZLSlgaltNpSVCySRUxL0NAh4FJpHWpxcZAUBEPG/AKHDsVBN5eGrCnoYKCDoDiUCKKBjtZBUZtJ2ojYJr40ue\u002B\u002B47k3VzD0hQr94OOed8853/k47z2cCETk2NAgk8mQDQMhhFjK5/Mb9vEotIDruoEsFovEzVvZbPaWLTcQ9uxCpVLp4l\u002Bk0\u002BlEPB5/wIPm7RVC9uxCMpm0UTdKpRKi0WiCQy3wUt8FCvw7VSNxbRapG4voDwucGgyjXC7bzH84ePt1HysbH/GhWoNstzA1OoSFhZuxQqFg8sfu4FutAd\u002BT8KSEYm7v7GJ0YnLClgYLaAcjU9N4Vx9Dda8OBz7OjwywSNsIXY39vEL7TxWpxv2eO3hWHUZ19xc8ti25UdvXzdpNWH0BDj8JiLOrPXfweOu9mRgRhOXUEPr7IiBfYeacB9HaBNRvQH4f6\u002BlgMERwGxJP7grEoq9shj9Uz\u002BVGpmIi4vXcwdzlcePgzLAuZPiSGw869Jg\u002Biw1Mvw50oLGcuoh71y8h1HwB1Js8UfFLnwScNnBhdYVLWsy1IwK5XM5GHaw9uu0LeSCMddZA32lz7zjOQxMcByK1SPU3O/Rjnai2fkjNz8/5L77TyQJ/AJc67LNf3QeWAAAAAElFTkSuQmCC",
-              "WhenOpened": "2025-08-14T11:43:37.021Z",
+              "DocumentIndex": 11,
+              "Title": "style.css",
+              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\staticfiles\\css\\style.css",
+              "RelativeDocumentMoniker": "staticfiles\\css\\style.css",
+              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\staticfiles\\css\\style.css",
+              "RelativeToolTip": "staticfiles\\css\\style.css",
+              "ViewState": "AQIAABcCAAAAAAAAAAAgwC0CAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-08-14T14:20:47.917Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 20,
+              "Title": "style.css",
+              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\static\\css\\style.css",
+              "RelativeDocumentMoniker": "static\\css\\style.css",
+              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\static\\css\\style.css",
+              "RelativeToolTip": "static\\css\\style.css",
+              "ViewState": "AQIAAJkAAAAAAAAAAAAgwK8AAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-08-14T11:39:25.307Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
               "Title": "news.html",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\news.html",
               "RelativeDocumentMoniker": "tracker\\templates\\news.html",
@@ -319,7 +358,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 19,
               "Title": "scripts.js",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\static\\js\\scripts.js",
               "RelativeDocumentMoniker": "static\\js\\scripts.js",
@@ -331,7 +370,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 15,
               "Title": "requirements.txt",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\requirements.txt",
               "RelativeDocumentMoniker": "requirements.txt",
@@ -343,7 +382,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 10,
               "Title": "__init__.py",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templatetags\\__init__.py",
               "RelativeDocumentMoniker": "tracker\\templatetags\\__init__.py",
@@ -355,7 +394,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 14,
               "Title": "manage.py",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\manage.py",
               "RelativeDocumentMoniker": "manage.py",
@@ -367,7 +406,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 12,
               "Title": "Dockerfile",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\Dockerfile",
               "RelativeDocumentMoniker": "Dockerfile",
@@ -379,7 +418,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 13,
               "Title": "docker-compose.yml",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\docker-compose.yml",
               "RelativeDocumentMoniker": "docker-compose.yml",
@@ -391,7 +430,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 17,
               "Title": "utils.py",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\utils.py",
               "RelativeDocumentMoniker": "tracker\\utils.py",
@@ -403,7 +442,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 21,
               "Title": "live_charts.html",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\live_charts.html",
               "RelativeDocumentMoniker": "tracker\\templates\\live_charts.html",
@@ -415,7 +454,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 18,
               "Title": "contact.html",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\contact.html",
               "RelativeDocumentMoniker": "tracker\\templates\\contact.html",
@@ -427,7 +466,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 22,
               "Title": "privacy.html",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\privacy.html",
               "RelativeDocumentMoniker": "tracker\\templates\\privacy.html",
@@ -439,7 +478,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 23,
               "Title": "terms.html",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\terms.html",
               "RelativeDocumentMoniker": "tracker\\templates\\terms.html",
@@ -451,7 +490,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 24,
               "Title": "about.html",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\about.html",
               "RelativeDocumentMoniker": "tracker\\templates\\about.html",
@@ -463,7 +502,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 25,
               "Title": "search.html",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\search.html",
               "RelativeDocumentMoniker": "tracker\\templates\\search.html",
@@ -475,7 +514,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 26,
               "Title": "settings.html",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\settings.html",
               "RelativeDocumentMoniker": "tracker\\templates\\settings.html",
@@ -487,7 +526,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 27,
               "Title": "profile.html",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\profile.html",
               "RelativeDocumentMoniker": "tracker\\templates\\profile.html",
@@ -499,19 +538,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
-              "Title": "urls.py",
-              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\crypto_tracker\\urls.py",
-              "RelativeDocumentMoniker": "crypto_tracker\\urls.py",
-              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\crypto_tracker\\urls.py",
-              "RelativeToolTip": "crypto_tracker\\urls.py",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAAkAAAA",
-              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHeSURBVDhPpVMxa1NRFP7ebZLSlgaltNpSVCySRUxL0NAh4FJpHWpxcZAUBEPG/AKHDsVBN5eGrCnoYKCDoDiUCKKBjtZBUZtJ2ojYJr40ue\u002B\u002B47k3VzD0hQr94OOed8853/k47z2cCETk2NAgk8mQDQMhhFjK5/Mb9vEotIDruoEsFovEzVvZbPaWLTcQ9uxCpVLp4l\u002Bk0\u002BlEPB5/wIPm7RVC9uxCMpm0UTdKpRKi0WiCQy3wUt8FCvw7VSNxbRapG4voDwucGgyjXC7bzH84ePt1HysbH/GhWoNstzA1OoSFhZuxQqFg8sfu4FutAd\u002BT8KSEYm7v7GJ0YnLClgYLaAcjU9N4Vx9Dda8OBz7OjwywSNsIXY39vEL7TxWpxv2eO3hWHUZ19xc8ti25UdvXzdpNWH0BDj8JiLOrPXfweOu9mRgRhOXUEPr7IiBfYeacB9HaBNRvQH4f6\u002BlgMERwGxJP7grEoq9shj9Uz\u002BVGpmIi4vXcwdzlcePgzLAuZPiSGw869Jg\u002Biw1Mvw50oLGcuoh71y8h1HwB1Js8UfFLnwScNnBhdYVLWsy1IwK5XM5GHaw9uu0LeSCMddZA32lz7zjOQxMcByK1SPU3O/Rjnai2fkjNz8/5L77TyQJ/AJc67LNf3QeWAAAAAElFTkSuQmCC",
-              "WhenOpened": "2025-08-14T11:44:01.007Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 28,
               "Title": "login.html",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\registration\\login.html",
               "RelativeDocumentMoniker": "tracker\\templates\\registration\\login.html",
@@ -523,7 +550,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 27,
+              "DocumentIndex": 29,
               "Title": "asgi.py",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\crypto_tracker\\asgi.py",
               "RelativeDocumentMoniker": "crypto_tracker\\asgi.py",
@@ -535,7 +562,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 28,
+              "DocumentIndex": 30,
               "Title": "routing.py",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\routing.py",
               "RelativeDocumentMoniker": "tracker\\routing.py",
@@ -547,7 +574,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 29,
+              "DocumentIndex": 31,
               "Title": "consumers.py",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\consumers.py",
               "RelativeDocumentMoniker": "tracker\\consumers.py",
@@ -559,7 +586,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 30,
+              "DocumentIndex": 32,
               "Title": "watchlist.html",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\watchlist.html",
               "RelativeDocumentMoniker": "tracker\\templates\\watchlist.html",
@@ -571,19 +598,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 31,
-              "Title": "portfolio.html",
-              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\portfolio.html",
-              "RelativeDocumentMoniker": "tracker\\templates\\portfolio.html",
-              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\portfolio.html",
-              "RelativeToolTip": "tracker\\templates\\portfolio.html",
-              "ViewState": "AQIAAH8AAAAAAAAAAAAgwJUAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
-              "WhenOpened": "2025-08-14T11:41:20.507Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 33,
+              "DocumentIndex": 34,
               "Title": "test.py",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\test.py",
               "RelativeDocumentMoniker": "test.py",
@@ -595,7 +610,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 34,
+              "DocumentIndex": 35,
               "Title": "technical.html",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\technical.html",
               "RelativeDocumentMoniker": "tracker\\templates\\technical.html",
@@ -607,7 +622,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 35,
+              "DocumentIndex": 36,
               "Title": "alerts.html",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\alerts.html",
               "RelativeDocumentMoniker": "tracker\\templates\\alerts.html",
@@ -619,7 +634,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 32,
+              "DocumentIndex": 33,
               "Title": ".env",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\.env",
               "RelativeDocumentMoniker": ".env",
@@ -631,7 +646,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 36,
+              "DocumentIndex": 37,
               "Title": "models.py",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\models.py",
               "RelativeDocumentMoniker": "tracker\\models.py",
@@ -643,7 +658,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 37,
+              "DocumentIndex": 38,
               "Title": "chart.min.js",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\static\\js\\chart.min.js",
               "RelativeDocumentMoniker": "static\\js\\chart.min.js",
@@ -655,7 +670,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 38,
+              "DocumentIndex": 39,
               "Title": "register.html",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\templates\\registration\\register.html",
               "RelativeDocumentMoniker": "tracker\\templates\\registration\\register.html",
@@ -667,7 +682,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 39,
+              "DocumentIndex": 40,
               "Title": "charts.js",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\static\\js\\charts.js",
               "RelativeDocumentMoniker": "static\\js\\charts.js",
@@ -679,7 +694,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 41,
+              "DocumentIndex": 42,
               "Title": "__init__.py",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\crypto_tracker\\__init__.py",
               "RelativeDocumentMoniker": "crypto_tracker\\__init__.py",
@@ -691,7 +706,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 42,
+              "DocumentIndex": 43,
               "Title": "celery.py",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\crypto_tracker\\celery.py",
               "RelativeDocumentMoniker": "crypto_tracker\\celery.py",
@@ -703,7 +718,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 40,
+              "DocumentIndex": 41,
               "Title": "tasks.py",
               "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\PYTHON CODES\\Claude\\crypto_tracker\\tracker\\tasks.py",
               "RelativeDocumentMoniker": "tracker\\tasks.py",
