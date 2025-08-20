@@ -164,3 +164,7 @@ Thumbs.db
 *.temp
 temp/
 tmp/ 
+
+# Visual Studio
+.vs/
+*.vsidx
