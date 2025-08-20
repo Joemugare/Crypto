@@ -1,5 +1,4 @@
-from decimal import Decimal
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -7,13 +6,13 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.core.cache import cache
+from decimal import Decimal
 from .models import Portfolio, Watchlist, Alert, CryptoPrice
 from .utils import fetch_market_data, fetch_news, fetch_sentiment
 
 def home(request):
     try:
         market_data = cache.get('market_data') or fetch_market_data() or {}
-        # Pre-format coin names to bypass capitalize_value filter
         formatted_data = {}
         for coin_id, data in market_data.items():
             formatted_data[coin_id] = {
@@ -24,7 +23,6 @@ def home(request):
                 'name': ' '.join(word.capitalize() for word in coin_id.replace('_', ' ').split())
             }
         cache.set('market_data', formatted_data, timeout=300)
-        print("market_data:", formatted_data)  # Debug print
     except Exception as e:
         formatted_data = {}
         messages.error(request, "Failed to fetch market data. Please try again later.")
@@ -118,6 +116,59 @@ def add_to_portfolio(request):
         messages.success(request, f"Added {cryptocurrency} to portfolio")
         return redirect("portfolio")
 
+    return redirect("portfolio")
+
+@login_required
+def edit_asset(request, cryptocurrency):
+    portfolio_item = get_object_or_404(Portfolio, user=request.user, cryptocurrency=cryptocurrency.lower())
+
+    if request.method == "POST":
+        amount = request.POST.get("amount")
+        purchase_price = request.POST.get("purchase_price")
+
+        try:
+            if not amount or not purchase_price:
+                raise ValidationError("All fields are required.")
+            amount = Decimal(amount)
+            purchase_price = Decimal(purchase_price)
+            if amount <= 0 or purchase_price <= 0:
+                raise ValidationError("Amount and purchase price must be positive.")
+        except (ValidationError, ValueError) as e:
+            messages.error(request, str(e))
+            return redirect("portfolio")
+
+        portfolio_item.amount = amount
+        portfolio_item.purchase_price = purchase_price
+        portfolio_item.save()
+        messages.success(request, f"Updated {cryptocurrency} in portfolio")
+        return redirect("portfolio")
+
+    market_data = cache.get('market_data') or fetch_market_data() or {}
+    cache.set('market_data', market_data, timeout=300)
+    price_map = {coin: Decimal(str(data["usd"])) for coin, data in market_data.items()}
+
+    portfolio_qs = Portfolio.objects.filter(user=request.user)
+    portfolio_data = [{
+        "cryptocurrency": p.cryptocurrency,
+        "amount": p.amount,
+        "purchase_price": p.purchase_price,
+        "current_price": price_map.get(p.cryptocurrency, Decimal('0.0')),
+        "profit_loss": (price_map.get(p.cryptocurrency, Decimal('0.0')) * p.amount) -
+                       (p.purchase_price * p.amount)
+    } for p in portfolio_qs]
+
+    return render(request, "portfolio.html", {
+        "portfolio": portfolio_data,
+        "edit_item": portfolio_item
+    })
+
+@login_required
+def remove_asset(request, cryptocurrency):
+    if request.method == "POST":
+        portfolio_item = get_object_or_404(Portfolio, user=request.user, cryptocurrency=cryptocurrency.lower())
+        portfolio_item.delete()
+        messages.success(request, f"Removed {cryptocurrency} from portfolio")
+        return redirect("portfolio")
     return redirect("portfolio")
 
 @login_required
@@ -293,4 +344,3 @@ def alerts_api(request):
         return JsonResponse({"alerts": alerts_data})
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
-    

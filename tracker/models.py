@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from decimal import Decimal
 
 class CryptoPrice(models.Model):
     cryptocurrency = models.CharField(max_length=100)
@@ -19,6 +20,12 @@ class Portfolio(models.Model):
     cryptocurrency = models.CharField(max_length=100)
     amount = models.DecimalField(max_digits=20, decimal_places=8)
     purchase_price = models.DecimalField(max_digits=20, decimal_places=2)
+
+    class Meta:
+        unique_together = ('user', 'cryptocurrency')  # Ensure uniqueness for user-cryptocurrency pair
+
+    def __str__(self):
+        return f"{self.user.username} - {self.cryptocurrency}"
 
 class Watchlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

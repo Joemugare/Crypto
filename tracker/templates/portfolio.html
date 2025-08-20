@@ -3,147 +3,754 @@
 {% block title %}Portfolio - Crypto Tracker{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2 class="mb-3">Portfolio</h2>
+<style>
+    :root {
+        background: #1a1a1a;
+        color: #ffffff;
+    }
+    --portfolio-primary: #667eea;
+    --portfolio-success: #00d4aa;
+    --portfolio-danger: #ff6b6b;
+    --portfolio-warning: #feca57;
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    --card-border-radius: 16px;
 
-    <!-- Add to Portfolio Form -->
-    <form method="post" action="{% url 'add_to_portfolio' %}" class="portfolio-form mb-4 glow-effect">
-        {% csrf_token %}
-        <div class="form-group">
-            <label for="cryptocurrency">Cryptocurrency:</label>
-            <input type="text" name="cryptocurrency" id="cryptocurrency" placeholder="e.g., bitcoin" required>
-        </div>
-        <div class="form-group">
-            <label for="amount">Amount:</label>
-            <input type="number" step="0.00000001" name="amount" id="amount" placeholder="Amount" required>
-        </div>
-        <div class="form-group">
-            <label for="purchase_price">Purchase Price (USD):</label>
-            <input type="number" step="0.01" name="purchase_price" id="purchase_price" placeholder="Purchase Price" required>
-        </div>
-        <button type="submit" class="btn-submit">Add to Portfolio</button>
-    </form>
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: var(--card-border-radius);
+        padding: 1.5rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: var(--card-shadow);
+    }
 
-    <!-- Portfolio Table -->
-    <div class="card glow-effect">
-        <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-coins"></i> Your Portfolio</h3>
-        </div>
-        <div class="card-body">
-            {% if portfolio %}
-                <div class="table-responsive">
-                    <table class="table table-hover portfolio-table">
-                        <thead>
-                            <tr>
-                                <th>Cryptocurrency</th>
-                                <th>Amount</th>
-                                <th>Purchase Price (USD)</th>
-                                <th>Current Price (USD)</th>
-                                <th>Profit/Loss</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in portfolio %}
-                                <tr class="portfolio-row">
-                                    <td>{{ item.cryptocurrency|default:"Unknown"|capitalize_value }}</td>
-                                    <td>{{ item.amount|floatformat:8 }}</td>
-                                    <td>${{ item.purchase_price|format_currency }}</td>
-                                    <td>${{ item.current_price|default:"0.00"|format_currency }}</td>
-                                    <td class="{% if item.profit_loss|default:0.0 >= 0 %}positive{% else %}negative{% endif %}">
-                                        ${{ item.profit_loss|default:"0.00"|format_number }}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .stats-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+        transform: translateX(-100%);
+        transition: transform 0.5s ease;
+    }
+
+    .stats-card:hover::before {
+        transform: translateX(100%);
+    }
+
+    .stats-card.total-value {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .stats-card.total-profit-loss {
+        background: linear-gradient(135deg, #00d4aa 0%, #00a085 100%);
+    }
+
+    .stats-card.best-performer {
+        background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%);
+    }
+
+    .stats-card.asset-count {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+    }
+
+    .stats-icon {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 2rem;
+        opacity: 0.3;
+    }
+
+    .stats-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .stats-number {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .stats-label {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 0.9rem;
+    }
+
+    .stats-trend {
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+        opacity: 0.8;
+    }
+
+    .enhanced-card {
+        background: white;
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--card-shadow);
+        border: none;
+        overflow: hidden;
+    }
+
+    .enhanced-card .card-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-bottom: 1px solid #dee2e6;
+        padding: 1rem 1.5rem;
+    }
+
+    .portfolio-table {
+        font-size: 0.95rem;
+    }
+
+    .portfolio-table th {
+        background: #f8f9fa;
+        border-top: none;
+        font-weight: 600;
+        padding: 1rem 0.75rem;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .portfolio-table th.sortable {
+        cursor: pointer;
+        user-select: none;
+        transition: background-color 0.2s ease;
+    }
+
+    .portfolio-table th.sortable:hover {
+        background-color: #e9ecef;
+    }
+
+    .portfolio-table th.sortable.sorted-asc .fa-sort::before {
+        content: "\f0de";
+    }
+
+    .portfolio-table th.sortable.sorted-desc .fa-sort::before {
+        content: "\f0dd";
+    }
+
+    .portfolio-row {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .portfolio-row:hover {
+        background-color: rgba(102, 126, 234, 0.05) !important;
+        transform: translateX(3px);
+    }
+
+    .asset-cell {
+        padding: 1rem 0.75rem;
+    }
+
+    .crypto-icon img {
+        width: 32px;
+        height: 32px;
+    }
+
+    .price-cell {
+        position: relative;
+    }
+
+    .price-change-up {
+        animation: priceUp 0.6s ease-out;
+    }
+
+    .price-change-down {
+        animation: priceDown 0.6s ease-out;
+    }
+
+    @keyframes priceUp {
+        0% { background-color: transparent; }
+        50% { background-color: rgba(0, 212, 170, 0.2); }
+        100% { background-color: transparent; }
+    }
+
+    @keyframes priceDown {
+        0% { background-color: transparent; }
+        50% { background-color: rgba(255, 107, 107, 0.2); }
+        100% { background-color: transparent; }
+    }
+
+    .portfolio-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border: 1px solid #e9ecef;
+    }
+
+    .portfolio-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .view-content.d-none {
+        display: none !important;
+    }
+
+    .loading-skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: skeleton 1.5s infinite;
+        border-radius: 4px;
+    }
+
+    @keyframes skeleton {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    .empty-state {
+        padding: 3rem 1rem;
+    }
+
+    .empty-icon {
+        opacity: 0.3;
+    }
+
+    .modal-content {
+        border-radius: var(--card-border-radius);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-control:focus {
+        border-color: var(--portfolio-primary);
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    @media (max-width: 768px) {
+        .stats-card {
+            margin-bottom: 1rem;
+        }
+        
+        .portfolio-table {
+            font-size: 0.85rem;
+        }
+        
+        .crypto-icon img {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .table-responsive {
+            border-radius: 8px;
+        }
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .enhanced-card {
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        .portfolio-table th {
+            background: #2c2c2c;
+        }
+        .portfolio-card {
+            background: #2c2c2c;
+            border-color: #444;
+        }
+        .modal-content {
+            background: #2c2c2c;
+            color: #ffffff;
+        }
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Portfolio Header with Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="mb-0">
+                    <i class="fas fa-briefcase me-2 text-primary"></i>
+                    Your Portfolio
+                </h2>
+                <div class="portfolio-actions">
+                    <button class="btn btn-outline-primary btn-sm me-2" onclick="exportPortfolio()">
+                        <i class="fas fa-download me-1"></i>Export
+                    </button>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addAssetModal">
+                        <i class="fas fa-plus me-1"></i>Add Asset
+                    </button>
                 </div>
-            {% else %}
-                <p class="text-center mt-3">Your portfolio is empty. Add assets above.</p>
-            {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Summary Cards -->
+    <div class="row mb-4" id="portfolioSummary">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stats-card total-value">
+                <div class="stats-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div class="stats-content">
+                    <h3 id="totalValue" class="stats-number">$0.00</h3>
+                    <p class="stats-label">Total Value</p>
+                    <div class="stats-trend" id="totalValueTrend"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stats-card total-profit-loss">
+                <div class="stats-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stats-content">
+                    <h3 id="totalProfitLoss" class="stats-number">$0.00</h3>
+                    <p class="stats-label">Total P&L</p>
+                    <div class="stats-trend" id="profitLossTrend"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stats-card best-performer">
+                <div class="stats-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="stats-content">
+                    <h3 id="bestPerformer" class="stats-number">-</h3>
+                    <p class="stats-label">Best Performer</p>
+                    <div class="stats-trend" id="bestPerformerGain"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stats-card asset-count">
+                <div class="stats-icon">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div class="stats-content">
+                    <h3 id="assetCount" class="stats-number">0</h3>
+                    <p class="stats-label">Assets</p>
+                    <div class="stats-trend">Diversification</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Content -->
+    <div class="row">
+        <!-- Portfolio Table -->
+        <div class="col-lg-8 mb-4">
+            <div class="enhanced-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-table me-2"></i>Holdings
+                    </h4>
+                    <div class="table-controls">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <input type="radio" class="btn-check" name="viewMode" id="tableView" autocomplete="off" checked>
+                            <label class="btn btn-outline-secondary" for="tableView">
+                                <i class="fas fa-table"></i>
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="viewMode" id="cardView" autocomplete="off">
+                            <label class="btn btn-outline-secondary" for="cardView">
+                                <i class="fas fa-th-large"></i>
+                            </label>
+                        </div>
+                        <button class="btn btn-outline-secondary btn-sm ms-2" onclick="refreshPortfolio()">
+                            <i class="fas fa-sync-alt" id="refreshIcon"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% if portfolio %}
+                        <!-- Table View -->
+                        <div id="tableViewContent" class="view-content">
+                            <div class="table-responsive">
+                                <table class="table table-hover portfolio-table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th class="sortable" data-sort="name">
+                                                Asset
+                                                <i class="fas fa-sort ms-1"></i>
+                                            </th>
+                                            <th class="sortable text-end" data-sort="amount">
+                                                Holdings
+                                                <i class="fas fa-sort ms-1"></i>
+                                            </th>
+                                            <th class="sortable text-end" data-sort="purchase_price">
+                                                Avg Buy Price
+                                                <i class="fas fa-sort ms-1"></i>
+                                            </th>
+                                            <th class="sortable text-end" data-sort="current_price">
+                                                Current Price
+                                                <i class="fas fa-sort ms-1"></i>
+                                            </th>
+                                            <th class="sortable text-end" data-sort="value">
+                                                Value
+                                                <i class="fas fa-sort ms-1"></i>
+                                            </th>
+                                            <th class="sortable text-end" data-sort="profit_loss">
+                                                P&L
+                                                <i class="fas fa-sort ms-1"></i>
+                                            </th>
+                                            <th class="text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="portfolioTableBody">
+                                        {% for item in portfolio %}
+                                            <tr class="portfolio-row" data-crypto="{{ item.cryptocurrency }}" data-amount="{{ item.amount }}" data-purchase-price="{{ item.purchase_price }}" data-current-price="{{ item.current_price|default:0 }}">
+                                                <td class="asset-cell">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="crypto-icon me-3">
+                                                            <img src="https://cryptoicons.org/api/icon/{{ item.cryptocurrency }}/32" 
+                                                                 alt="{{ item.cryptocurrency }}" 
+                                                                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiMzMzMzMzMiLz4KPHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTggMEM4IDAgOCAwIDggMFMxNiA4IDE2IDhTOCAxNiA4IDE2UzAgOCAwIDhTOCAwIDggMFoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo8L3N2Zz4K'" 
+                                                                 class="rounded-circle"
+                                                                 loading="lazy">
+                                                        </div>
+                                                        <div>
+                                                            <div class="fw-bold">{{ item.cryptocurrency|default:"Unknown"|capitalize_value }}</div>
+                                                            <small class="text-muted">{{ item.cryptocurrency|upper }}</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-end">
+                                                    <div class="fw-bold">{{ item.amount|floatformat:8 }}</div>
+                                                </td>
+                                                <td class="text-end">
+                                                    <div class="fw-bold">${{ item.purchase_price|format_currency }}</div>
+                                                </td>
+                                                <td class="text-end">
+                                                    <div class="fw-bold price-cell" data-crypto="{{ item.cryptocurrency }}">
+                                                        ${{ item.current_price|default:"0.00"|format_currency }}
+                                                    </div>
+                                                </td>
+                                                <td class="text-end">
+                                                    <div class="fw-bold value-cell">
+                                                        $<span class="calculated-value" data-amount="{{ item.amount }}" data-price="{{ item.current_price|default:0 }}">0.00</span>
+                                                    </div>
+                                                </td>
+                                                <td class="text-end">
+                                                    {% with profit_loss=item.profit_loss|default:0.0 %}
+                                                        <div class="profit-loss-cell {% if profit_loss >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                                            <div class="fw-bold">
+                                                                {% if profit_loss >= 0 %}+{% endif %}${{ profit_loss|format_number }}
+                                                            </div>
+                                                            <small class="profit-loss-percentage" data-profit="{{ profit_loss }}" data-purchase="{{ item.purchase_price }}">
+                                                                0.00%
+                                                            </small>
+                                                        </div>
+                                                    {% endwith %}
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="btn-group btn-group-sm">
+                                                        <button class="btn btn-outline-primary btn-sm" onclick="editAsset('{{ item.cryptocurrency }}', {{ item.amount }}, {{ item.purchase_price }})" title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-outline-danger btn-sm" onclick="removeAsset('{{ item.cryptocurrency }}')" title="Remove">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Card View -->
+                        <div id="cardViewContent" class="view-content d-none">
+                            <div class="row g-3 p-3" id="portfolioCards">
+                                {% for item in portfolio %}
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="portfolio-card">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <div class="d-flex align-items-center">
+                                                    <img src="https://cryptoicons.org/api/icon/{{ item.cryptocurrency }}/24" 
+                                                         alt="{{ item.cryptocurrency }}" 
+                                                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTIiIGZpbGw9IiMzMzMzMzMiLz4KPHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTYgMEM2IDAgNiAwIDYgMFMxMiA2IDEyIDZTNiAxMiA2IDEyUzAgNiAwIDZTNiAwIDYgMFoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo8L3N2Zz4K'" 
+                                                         class="rounded-circle me-2"
+                                                         loading="lazy">
+                                                    <h6 class="mb-0">{{ item.cryptocurrency|capitalize_value }}</h6>
+                                                </div>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                                                        <i class="fas fa-ellipsis-v"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="#" onclick="editAsset('{{ item.cryptocurrency }}', {{ item.amount }}, {{ item.purchase_price }})">Edit</a></li>
+                                                        <li><a class="dropdown-item text-danger" href="#" onclick="removeAsset('{{ item.cryptocurrency }}')">Remove</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="mb-2">
+                                                <small class="text-muted">Holdings</small>
+                                                <div class="fw-bold">{{ item.amount|floatformat:8 }}</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <small class="text-muted">Buy Price</small>
+                                                    <div class="fw-bold">${{ item.purchase_price|format_currency }}</div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <small class="text-muted">Current</small>
+                                                    <div class="fw-bold">${{ item.current_price|default:"0.00"|format_currency }}</div>
+                                                </div>
+                                            </div>
+                                            <hr class="my-2">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <small class="text-muted">Value</small>
+                                                    <div class="fw-bold">$<span class="calculated-value" data-amount="{{ item.amount }}" data-price="{{ item.current_price|default:0 }}">0.00</span></div>
+                                                </div>
+                                                {% with profit_loss=item.profit_loss|default:0.0 %}
+                                                    <div class="text-end {% if profit_loss >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                                        <div class="fw-bold">
+                                                            {% if profit_loss >= 0 %}+{% endif %}${{ profit_loss|format_number }}
+                                                        </div>
+                                                        <small class="profit-loss-percentage" data-profit="{{ profit_loss }}" data-purchase="{{ item.purchase_price }}">
+                                                            0.00%
+                                                        </small>
+                                                    </div>
+                                                {% endwith %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="empty-state text-center py-5">
+                            <div class="empty-icon mb-3">
+                                <i class="fas fa-briefcase fa-4x text-muted"></i>
+                            </div>
+                            <h5 class="text-muted">Your portfolio is empty</h5>
+                            <p class="text-muted mb-4">Start building your crypto portfolio by adding your first asset</p>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAssetModal">
+                                <i class="fas fa-plus me-2"></i>Add Your First Asset
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Chart -->
+        <div class="col-lg-4 mb-4">
+            <div class="enhanced-card h-100">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>Allocation
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <canvas id="allocationChart" width="400" height="300"></canvas>
+                    <div class="allocation-legend mt-3" id="allocationLegend">
+                        <!-- Legend will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Chart -->
+    <div class="row">
+        <div class="col-12">
+            <div class="enhanced-card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-chart-line me-2"></i>Portfolio Performance
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <canvas id="performanceChart" height="100"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<style>
-/* Glow effect for cards and form */
-.glow-effect {
-    background: #0b0c1a;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
-    padding: 20px;
+<!-- Add/Edit Asset Modal -->
+<div class="modal fade" id="addAssetModal" tabindex="-1" aria-labelledby="addAssetModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAssetModalLabel">
+                    <i class="fas fa-plus me-2"></i>
+                    {% if edit_item %}Edit Asset{% else %}Add Asset to Portfolio{% endif %}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% if edit_item %}{% url 'edit_asset' edit_item.cryptocurrency %}{% else %}{% url 'add_to_portfolio' %}{% endif %}" id="assetForm">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="cryptocurrency" class="form-label">Cryptocurrency</label>
+                        <input type="text" class="form-control" name="cryptocurrency" id="cryptocurrency" 
+                               placeholder="e.g., bitcoin, ethereum" required autocomplete="off"
+                               value="{% if edit_item %}{{ edit_item.cryptocurrency }}{% endif %}"
+                               {% if edit_item %}disabled{% endif %}>
+                        <div class="invalid-feedback">Please enter a valid cryptocurrency name.</div>
+                        <small class="form-text text-muted">Start typing to see suggestions</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Amount</label>
+                        <input type="number" step="0.00000001" class="form-control" name="amount" id="amount" 
+                               placeholder="0.00000000" required min="0.00000001"
+                               value="{% if edit_item %}{{ edit_item.amount }}{% endif %}">
+                        <div class="invalid-feedback">Please enter a valid amount.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="purchase_price" class="form-label">Purchase Price (USD)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" step="0.01" class="form-control" name="purchase_price" id="purchase_price" 
+                                   placeholder="0.00" required min="0.01"
+                                   value="{% if edit_item %}{{ edit_item.purchase_price }}{% endif %}">
+                            <button class="btn btn-outline-secondary" type="button" onclick="getCurrentPrice()">
+                                Current Price
+                            </button>
+                        </div>
+                        <div class="invalid-feedback">Please enter a valid purchase price.</div>
+                    </div>
+                    <div class="alert alert-info d-none" id="priceAlert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span id="priceAlertText"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-plus me-1"></i>
+                        {% if edit_item %}Update Asset{% else %}Add Asset{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirm Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                <p id="confirmMessage">Are you sure you want to proceed?</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function editAsset(cryptocurrency, amount, purchase_price) {
+    console.log('Edit clicked:', cryptocurrency, amount, purchase_price); // Debug log
+    const modal = document.getElementById('addAssetModal');
+    const modalTitle = document.getElementById('addAssetModalLabel');
+    const form = document.getElementById('assetForm');
+    const cryptoInput = document.getElementById('cryptocurrency');
+    const amountInput = document.getElementById('amount');
+    const priceInput = document.getElementById('purchase_price');
+
+    modalTitle.innerText = 'Edit Asset';
+    form.action = `/portfolio/edit/${cryptocurrency}/`;
+    cryptoInput.value = cryptocurrency;
+    amountInput.value = amount;
+    priceInput.value = purchase_price;
+    cryptoInput.disabled = true;
+
+    const modalInstance = new bootstrap.Modal(modal);
+    modalInstance.show();
+
+    modal.addEventListener('hidden.bs.modal', function () {
+        modalTitle.innerText = 'Add Asset to Portfolio';
+        form.action = "{% url 'add_to_portfolio' %}";
+        form.reset();
+        cryptoInput.disabled = false;
+    }, { once: true });
 }
 
-/* Portfolio form styles */
-.portfolio-form .form-group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 12px;
+function removeAsset(cryptocurrency) {
+    console.log('Remove clicked:', cryptocurrency); // Debug log
+    const confirmModal = document.getElementById('confirmModal');
+    const confirmMessage = document.getElementById('confirmMessage');
+    const confirmBtn = document.getElementById('confirmBtn');
+
+    confirmMessage.innerText = `Are you sure you want to remove ${cryptocurrency} from your portfolio?`;
+    confirmBtn.onclick = function() {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/portfolio/remove/${cryptocurrency}/`;
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+        document.body.appendChild(form);
+        form.submit();
+    };
+
+    const modalInstance = new bootstrap.Modal(confirmModal);
+    modalInstance.show();
 }
 
-.portfolio-form input {
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    background: #1c1f34;
-    color: #fff;
-    transition: border 0.3s, box-shadow 0.3s;
+function getCurrentPrice() {
+    const cryptoInput = document.getElementById('cryptocurrency').value.toLowerCase();
+    if (!cryptoInput) {
+        alert('Please enter a cryptocurrency first.');
+        return;
+    }
+    fetch('/api/market-data/')
+        .then(response => response.json())
+        .then(data => {
+            const price = data.market_data[cryptoInput]?.usd;
+            if (price) {
+                document.getElementById('purchase_price').value = price;
+                document.getElementById('priceAlert').classList.remove('d-none');
+                document.getElementById('priceAlertText').innerText = `Current price for ${cryptoInput} is $${price}`;
+            } else {
+                alert('Could not fetch current price for ' + cryptoInput);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching price:', error);
+            alert('Failed to fetch current price.');
+        });
 }
 
-.portfolio-form input:focus {
-    border-color: #00d4ff;
-    box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
-    outline: none;
+// Optional: Toggle between table and card view
+document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        document.getElementById('tableViewContent').classList.toggle('d-none', this.id !== 'tableView');
+        document.getElementById('cardViewContent').classList.toggle('d-none', this.id !== 'cardView');
+    });
+});
+
+// Placeholder for exportPortfolio and refreshPortfolio
+function exportPortfolio() {
+    console.log('Export portfolio clicked'); // Implement export logic
 }
 
-.btn-submit {
-    background: #00d4ff;
-    color: #0b0c1a;
-    font-weight: bold;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+function refreshPortfolio() {
+    console.log('Refresh portfolio clicked'); // Implement refresh logic
 }
-
-.btn-submit:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
-}
-
-/* Portfolio table styles */
-.portfolio-table th, .portfolio-table td {
-    text-align: center;
-    vertical-align: middle;
-    color: #fff;
-}
-
-.portfolio-row:hover {
-    background: rgba(0, 212, 255, 0.1);
-    transform: scale(1.02);
-    transition: transform 0.2s, background 0.2s;
-}
-
-.positive {
-    color: #00ff99;
-    font-weight: bold;
-    animation: pulse-green 1.5s infinite;
-}
-
-.negative {
-    color: #ff4d4d;
-    font-weight: bold;
-    animation: pulse-red 1.5s infinite;
-}
-
-@keyframes pulse-green {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-@keyframes pulse-red {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-</style>
+</script>
 {% endblock %}
