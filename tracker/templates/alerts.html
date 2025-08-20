@@ -1,70 +1,352 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% load format_filters %}
 
 {% block title %}Alerts - Crypto Tracker{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2>Price Alerts</h2>
+<style>
+    /* Enhanced Alerts Styles */
+    :root {
+        --portfolio-primary: #667eea;
+        --portfolio-success: #00d4aa;
+        --portfolio-danger: #ff6b6b;
+        --portfolio-warning: #feca57;
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --card-border-radius: 16px;
+    }
 
-    <form method="post" action="{% url 'add_alert' %}">
-        {% csrf_token %}
-        <div class="form-group">
-            <label for="cryptocurrency">Cryptocurrency:</label>
-            <input type="text" name="cryptocurrency" id="cryptocurrency" placeholder="e.g., bitcoin" required class="form-control">
-        </div>
-        <div class="form-group">
-            <label for="target_price">Target Price (USD):</label>
-            <input type="number" step="0.01" name="target_price" id="target_price" placeholder="Target Price" required class="form-control">
-        </div>
-        <div class="form-group">
-            <label for="condition">Condition:</label>
-            <select name="condition" id="condition" class="form-control">
-                <option value="above">Above</option>
-                <option value="below">Below</option>
-            </select>
-        </div>
-        <button type="submit" class="btn btn-primary mt-2">Set Alert</button>
-    </form>
+    /* Enhanced Card */
+    .enhanced-card {
+        background: white;
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--card-shadow);
+        border: none;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
 
-    <div class="card mt-4 glow-effect">
-        <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-bell"></i> Your Alerts</h3>
-        </div>
-        <div class="card-body">
-            {% if alerts %}
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Cryptocurrency</th>
-                                <th>Target Price (USD)</th>
-                                <th>Condition</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for alert in alerts %}
-                                <tr>
-                                    <td>{{ alert.cryptocurrency|capitalize_value }}</td>
-                                    <td>${{ alert.target_price|format_currency }}</td>
-                                    <td>{{ alert.condition|capitalize_value }}</td>
-                                    <td>
-                                        {% if alert.is_active %}
-                                            Active
-                                        {% else %}
-                                            Inactive
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+    .enhanced-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .enhanced-card .card-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-bottom: 1px solid #dee2e6;
+        padding: 1rem 1.5rem;
+    }
+
+    /* Table Styling */
+    .alerts-table {
+        font-size: 0.95rem;
+    }
+
+    .alerts-table th {
+        background: #f8f9fa;
+        border-top: none;
+        font-weight: 600;
+        padding: 1rem 0.75rem;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .alerts-table th.sortable {
+        cursor: pointer;
+        user-select: none;
+        transition: background-color 0.2s ease;
+    }
+
+    .alerts-table th.sortable:hover {
+        background-color: #e9ecef;
+    }
+
+    .alerts-table th.sortable.sorted-asc .fa-sort::before {
+        content: "\f0de";
+    }
+
+    .alerts-table th sortable.sorted-desc .fa-sort::before {
+        content: "\f0dd";
+    }
+
+    .alerts-row {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .alerts-row:hover {
+        background-color: rgba(102, 126, 234, 0.05) !important;
+        transform: translateX(3px);
+    }
+
+    .crypto-icon img {
+        width: 32px;
+        height: 32px;
+    }
+
+    /* Form Styling (Modal) */
+    .form-control:focus {
+        border-color: var(--portfolio-primary);
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        padding: 0.5rem 1rem;
+    }
+
+    /* Status Styling */
+    .status-active {
+        color: var(--portfolio-success);
+        font-weight: 500;
+    }
+
+    .status-inactive {
+        color: var(--portfolio-danger);
+        font-weight: 500;
+    }
+
+    /* Empty State */
+    .empty-state {
+        padding: 3rem 1rem;
+        text-align: center;
+    }
+
+    .empty-icon {
+        opacity: 0.3;
+    }
+
+    /* Modal Styling */
+    .modal-content {
+        border-radius: var(--card-border-radius);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Responsive Improvements */
+    @media (max-width: 768px) {
+        .alerts-table {
+            font-size: 0.85rem;
+        }
+
+        .crypto-icon img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .table-responsive {
+            border-radius: 8px;
+        }
+    }
+
+    /* Dark Mode Support */
+    @media (prefers-color-scheme: dark) {
+        .enhanced-card {
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .alerts-table th {
+            background: #2c2c2c;
+        }
+
+        .form-control, .form-select {
+            background: #2c2c2c;
+            color: #ffffff;
+            border-color: #444;
+        }
+
+        .empty-state {
+            color: #ffffff;
+        }
+
+        .empty-state .text-muted {
+            color: #aaaaaa !important;
+        }
+
+        .modal-content {
+            background: #2c2c2c;
+            color: #ffffff;
+        }
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Alerts Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="mb-0">
+                    <i class="fas fa-bell me-2 text-primary"></i>
+                    Price Alerts
+                </h2>
+                <div class="alerts-actions">
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addAlertModal">
+                        <i class="fas fa-plus me-1"></i>Set Alert
+                    </button>
                 </div>
-            {% else %}
-                <p class="text-center mt-3">No alerts set. Add one above.</p>
-            {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts Content -->
+    <div class="row">
+        <div class="col-12">
+            <div class="enhanced-card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-bell me-2"></i>Your Alerts
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if alerts %}
+                        <div class="table-responsive">
+                            <table class="table table-hover alerts-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" data-sort="cryptocurrency">
+                                            Cryptocurrency
+                                            <i class="fas fa-sort ms-1"></i>
+                                        </th>
+                                        <th class="sortable text-end" data-sort="target_price">
+                                            Target Price (USD)
+                                            <i class="fas fa-sort ms-1"></i>
+                                        </th>
+                                        <th class="sortable text-end" data-sort="condition">
+                                            Condition
+                                            < three class="fas fa-sort ms-1"></i>
+                                        </th>
+                                        <th class="sortable text-end" data-sort="status">
+                                            Status
+                                            <i class="fas fa-sort ms-1"></i>
+                                        </th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="alertsTableBody">
+                                    {% for alert in alerts %}
+                                        <tr class="alerts-row" data-alert-id="{{ alert.id }}">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="crypto-icon me-3">
+                                                        <img src="https://cryptoicons.org/api/icon/{{ alert.cryptocurrency }}/32"
+                                                             alt="{{ alert.cryptocurrency }}"
+                                                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiMzMzMzMzMiLz4KPHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTggMEM4IDAgOCAwIDggMFMxNiA4IDE2IDhTOCAxNiA4IDE2UzAgOCAwIDhTOCAwIDggMFoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo8L3N2Zz4K'"
+                                                             class="rounded-circle"
+                                                             loading="lazy">
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold">{{ alert.cryptocurrency|default:"Unknown"|capitalize_value }}</div>
+                                                        <small class="text-muted">{{ alert.cryptocurrency|upper }}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-end">
+                                                <div class="fw-bold">${{ alert.target_price|format_currency }}</div>
+                                            </td>
+                                            <td class="text-end">
+                                                <div class="fw-bold">{{ alert.condition|capitalize_value }}</div>
+                                            </td>
+                                            <td class="text-end">
+                                                <span class="{% if alert.is_active %}status-active{% else %}status-inactive{% endif %}">
+                                                    {% if alert.is_active %}Active{% else %}Inactive{% endif %}
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <button class="btn btn-outline-danger btn-sm" onclick="removeAlert('{{ alert.id }}')" title="Remove">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div двад>
+                    {% else %}
+                        <div class="empty-state">
+                            <div class="empty-icon mb-3">
+                                <i class="fas fa-bell fa-4x text-muted"></i>
+                            </div>
+                            <h5 class="text-muted">No alerts set</h5>
+                            <p class="text-muted mb-4">Set a price alert to track cryptocurrency price movements.</p>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAlertModal">
+                                <i class="fas fa-plus me-2"></i>Set Your First Alert
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Add Alert Modal -->
+<div class="modal fade" id="addAlertModal" tabindex="-1" aria-labelledby="addAlertModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAlertModalLabel">
+                    <i class="fas fa-plus me-2"></i>Set Price Alert
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'add_alert' %}" id="alertForm">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="cryptocurrency" class="form-label">Cryptocurrency</label>
+                        <input type="text" class="form-control" name="cryptocurrency" id="cryptocurrency"
+                               placeholder="e.g., bitcoin, ethereum" required autocomplete="off">
+                        <div class="invalid-feedback">Please enter a valid cryptocurrency name.</div>
+                        <small class="form-text text-muted">Start typing to see suggestions</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="target_price" class="form-label">Target Price (USD)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" step="0.01" class="form-control" name="target_price" id="target_price"
+                                   placeholder="0.00" required min="0.01">
+                        </div>
+                        <div class="invalid-feedback">Please enter a valid target price.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="condition" class="form-label">Condition</label>
+                        <select name="condition" id="condition" class="form-select" required>
+                            <option value="above">Above</option>
+                            <option value="below">Below</option>
+                        </select>
+                        <div class="invalid-feedback">Please select a condition.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitAlertBtn">
+                        <i class="fas fa-plus me-1"></i>Set Alert
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal for Removal -->
+<div class="modal fade" id="confirmAlertModal" tabindex="-1" aria-labelledby="confirmAlertModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmAlertModalLabel">Confirm Removal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                <p id="confirmAlertMessage">Are you sure you want to remove this alert?</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmAlertBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

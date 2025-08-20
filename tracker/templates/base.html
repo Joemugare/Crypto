@@ -5,109 +5,402 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Crypto Tracker{% endblock %}</title>
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://s3.tradingview.com">
+
     <!-- Favicon -->
     <link rel="icon" href="{% static 'images/logo.png' %}?v=4">
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-    <!-- TradingView Widget -->
-    <script src="https://s3.tradingview.com/tv.js"></script>
+
+    <!-- Critical CSS -->
+    <style>
+        /* Shared CSS Variables */
+        :root {
+            --portfolio-primary: #667eea;
+            --portfolio-success: #00d4aa;
+            --portfolio-danger: #ff6b6b;
+            --portfolio-warning: #feca57;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --card-border-radius: 16px;
+            --bg-color: #212529;
+            --text-color: #f8f9fa;
+            --navbar-bg: #343a40;
+            --navbar-text: #f8f9fa;
+            --transition-speed: 0.3s;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f8f9fa;
+            --text-color: #212529;
+            --navbar-bg: #ffffff;
+            --navbar-text: #212529;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+        }
+
+        /* Enhanced Card (Shared across templates) */
+        .enhanced-card {
+            background: white;
+            border-radius: var(--card-border-radius);
+            box-shadow: var(--card-shadow);
+            border: none;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .enhanced-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .enhanced-card .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 1px solid #dee2e6;
+            padding: 1rem 1.5rem;
+        }
+
+        /* Alerts */
+        .alert {
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-info { background-color: #e7f3ff; color: #31708f; }
+        .alert-warning { background-color: #fff3cd; color: #856404; }
+        .alert-success { background-color: #d4edda; color: #155724; }
+        .alert-danger { background-color: #f8d7da; color: #721c24; }
+
+        /* Loading States */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: var(--card-border-radius);
+        }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Navbar */
+        .navbar {
+            backdrop-filter: blur(10px);
+            background-color: var(--navbar-bg) !important;
+            box-shadow: var(--card-shadow);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--navbar-text);
+        }
+
+        .nav-link {
+            color: var(--navbar-text);
+            transition: color var(--transition-speed);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--portfolio-primary);
+        }
+
+        /* Price Ticker */
+        .ticker-container {
+            background: #0e1a2b;
+            border-radius: var(--card-border-radius);
+            padding: 1rem;
+            overflow: hidden;
+            color: #ffffff;
+            box-shadow: var(--card-shadow);
+            position: relative;
+        }
+
+        .ticker {
+            display: flex;
+            animation: scroll 30s linear infinite;
+            white-space: nowrap;
+        }
+
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            margin-right: 3rem;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        .ticker-item img {
+            width: 24px;
+            height: 24px;
+            margin-right: 0.5rem;
+        }
+
+        .ticker-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Price Change Animations */
+        .price-up {
+            animation: priceUp 0.6s ease-out;
+        }
+
+        .price-down {
+            animation: priceDown 0.6s ease-out;
+        }
+
+        @keyframes priceUp {
+            0% { background-color: transparent; }
+            50% { background-color: rgba(0, 212, 170, 0.3); }
+            100% { background-color: transparent; }
+        }
+
+        @keyframes priceDown {
+            0% { background-color: transparent; }
+            50% { background-color: rgba(255, 107, 107, 0.3); }
+            100% { background-color: transparent; }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--portfolio-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error States */
+        .error-message {
+            background-color: rgba(255, 107, 107, 0.1);
+            border: 1px solid var(--portfolio-danger);
+            color: var(--portfolio-danger);
+            padding: 1rem;
+            border-radius: var(--card-border-radius);
+            margin: 1rem 0;
+        }
+
+        /* Fade Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Improvements */
+        @media (max-width: 768px) {
+            .ticker-item {
+                font-size: 0.85rem;
+                margin-right: 2rem;
+            }
+
+            .ticker-item img {
+                width: 20px;
+                height: 20px;
+            }
+
+            .navbar-brand {
+                font-size: 1.25rem;
+            }
+
+            .nav-link {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Dark Mode Overrides */
+        @media (prefers-color-scheme: dark) {
+            .enhanced-card {
+                background: #1a1a1a;
+                color: #ffffff;
+            }
+
+            .enhanced-card .card-header {
+                background: linear-gradient(135deg, #2c2c2c 0%, #343a40 100%);
+            }
+
+            .alert-info { background-color: #2a3e5b; color: #a8c7e6; }
+            .alert-warning { background-color: #5c4623; color: #f7d9a0; }
+            .alert-success { background-color: #2e4e34; color: #a2d6a9; }
+            .alert-danger { background-color: #5c2a2e; color: #e6a8ac; }
+        }
+    </style>
+
+    <!-- Bootstrap CSS (non-blocking) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></noscript>
+
+    <!-- Font Awesome CSS (non-blocking) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"></noscript>
+
     <!-- Custom CSS -->
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
 </head>
 <body>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2169399263370531"
-     crossorigin="anonymous"></script>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-JYL1JM5YVB"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <!-- Analytics (async) -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2169399263370531" crossorigin="anonymous"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JYL1JM5YVB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-JYL1JM5YVB');
+    </script>
 
-  gtag('config', 'G-JYL1JM5YVB');
-</script>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background-color: var(--bg-color); z-index: 9999;">
+        <div class="text-center">
+            <div class="spinner mb-3"></div>
+            <h5>Loading Crypto Tracker...</h5>
+        </div>
+    </div>
+
+    <!-- Connection Status -->
+    <div id="connectionStatus" class="alert alert-warning position-fixed top-0 start-50 translate-middle-x mt-2" style="display: none; z-index: 1050;">
+        <i class="fas fa-wifi me-2"></i>Connection lost. Retrying...
+    </div>
 
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top" role="navigation" aria-label="Main navigation">
         <div class="container-fluid">
-            <a class="navbar-brand animate-nav" href="{% url 'home' %}" aria-label="Crypto Tracker Home">
-                <span class="brand-text">Crypto Tracker</span>
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}" aria-label="Crypto Tracker Home">
+                <i class="fas fa-chart-line me-2"></i>
+                Crypto Tracker
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
-                    data-bs-target="#navbarNav" aria-controls="navbarNav" 
-                    aria-expanded="false" aria-label="Toggle navigation">
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link animate-nav {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">Home</a>
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}" aria-current="{% if request.path == '/' %}page{% endif %}">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link animate-nav {% if 'dashboard' in request.path %}active{% endif %}" href="{% url 'dashboard' %}">Dashboard</a>
+                        <a class="nav-link {% if 'dashboard' in request.path %}active{% endif %}" href="{% url 'dashboard' %}" aria-current="{% if 'dashboard' in request.path %}page{% endif %}">
+                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link animate-nav {% if 'portfolio' in request.path %}active{% endif %}" href="{% url 'portfolio' %}">Portfolio</a>
+                        <a class="nav-link {% if 'portfolio' in request.path %}active{% endif %}" href="{% url 'portfolio' %}" aria-current="{% if 'portfolio' in request.path %}page{% endif %}">
+                            <i class="fas fa-briefcase me-1"></i>Portfolio
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link animate-nav {% if 'watchlist' in request.path %}active{% endif %}" href="{% url 'watchlist' %}">Watchlist</a>
+                        <a class="nav-link {% if 'watchlist' in request.path %}active{% endif %}" href="{% url 'watchlist' %}" aria-current="{% if 'watchlist' in request.path %}page{% endif %}">
+                            <i class="fas fa-star me-1"></i>Watchlist
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link animate-nav {% if 'alerts' in request.path %}active{% endif %}" href="{% url 'alerts' %}">Alerts</a>
+                        <a class="nav-link {% if 'alerts' in request.path %}active{% endif %}" href="{% url 'alerts' %}" aria-current="{% if 'alerts' in request.path %}page{% endif %}">
+                            <i class="fas fa-bell me-1"></i>Alerts
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {% if 'technical' in request.path or 'live_charts' in request.path %}active{% endif %}" href="#" id="analyticsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-chart-area me-1"></i>Analytics
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="analyticsDropdown">
+                            <li><a class="dropdown-item" href="{% url 'technical' %}"><i class="fas fa-chart-line me-2"></i>Technical Analysis</a></li>
+                            <li><a class="dropdown-item" href="{% url 'live_charts' %}"><i class="fas fa-chart-bar me-2"></i>Live Charts</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link animate-nav {% if 'technical' in request.path %}active{% endif %}" href="{% url 'technical' %}">Technical Analysis</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link animate-nav {% if 'news' in request.path %}active{% endif %}" href="{% url 'news' %}">Market News</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link animate-nav {% if 'live_charts' in request.path %}active{% endif %}" href="{% url 'live_charts' %}">Live Charts</a>
+                        <a class="nav-link {% if 'news' in request.path %}active{% endif %}" href="{% url 'news' %}" aria-current="{% if 'news' in request.path %}page{% endif %}">
+                            <i class="fas fa-newspaper me-1"></i>News
+                        </a>
                     </li>
                 </ul>
 
-                <form class="d-flex me-3" action="{% url 'search' %}" method="get">
-                    <input class="form-control me-2 search-input" type="search" name="q" placeholder="Search cryptocurrencies..." aria-label="Search cryptocurrencies">
-                    <button class="btn btn-outline-light animate-button" type="submit" aria-label="Search"><i class="fas fa-search"></i></button>
+                <!-- Search Bar -->
+                <form class="d-flex me-3 position-relative" action="{% url 'search' %}" method="get" id="searchForm">
+                    <div class="input-group">
+                        <input class="form-control" type="search" name="q" id="searchInput"
+                               placeholder="Search cryptocurrencies..." aria-label="Search cryptocurrencies"
+                               autocomplete="off" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="btn btn-outline-light" type="submit" aria-label="Search">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <ul class="dropdown-menu w-100 mt-1" id="searchSuggestions" style="display: none;"></ul>
+                    </div>
                 </form>
 
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle animate-nav" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user"></i> {{ user.username }}
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle me-2"></i>
+                                <span class="d-none d-md-inline">{{ user.username }}</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
-                                <li><a class="dropdown-item" href="{% url 'settings' %}">Settings</a></li>
+                                <li><h6 class="dropdown-header">{{ user.get_full_name|default:user.username }}</h6></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'settings' %}"><i class="fas fa-cog me-2"></i>Settings</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form action="{% url 'logout' %}" method="post" class="d-inline">
                                         {% csrf_token %}
                                         <button type="submit" class="dropdown-item text-danger">
-                                            <i class="fas fa-sign-out-alt"></i> Logout
+                                            <i class="fas fa-sign-out-alt me-2"></i>Logout
                                         </button>
                                     </form>
                                 </li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle animate-nav" href="#" id="alertsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-bell"></i> Alerts <span id="alertCount" class="badge bg-danger">0</span>
+                            <a class="nav-link dropdown-toggle position-relative" href="#" id="alertsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-bell"></i>
+                                <span id="alertCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">0</span>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="alertsDropdown" id="alertsList">
-                                <li><a class="dropdown-item" href="{% url 'alerts' %}">No active alerts</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="alertsDropdown" id="alertsList" style="min-width: 280px;">
+                                <li><h6 class="dropdown-header">Recent Alerts</h6></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li class="px-3 py-2 text-muted text-center">
+                                    <div class="spinner spinner-sm"></div>
+                                    Loading alerts...
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-center" href="{% url 'alerts' %}">View All Alerts</a></li>
                             </ul>
                         </li>
                     {% else %}
-                        <li class="nav-item"><a class="nav-link animate-nav" href="{% url 'login' %}">Login</a></li>
-                        <li class="nav-item"><a class="nav-link animate-nav" href="{% url 'register' %}">Register</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt me-1"></i>Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'register' %}"><i class="fas fa-user-plus me-1"></i>Register</a></li>
                     {% endif %}
                     <li class="nav-item">
-                        <button id="themeToggle" class="btn btn-outline-light btn-sm ms-2 animate-button" aria-label="Toggle theme">
+                        <button id="themeToggle" class="btn btn-outline-light btn-sm ms-2" aria-label="Toggle theme" title="Toggle theme">
                             <i class="fas fa-moon"></i>
                         </button>
                     </li>
@@ -117,24 +410,27 @@
     </nav>
 
     <!-- Price Ticker -->
-    <div class="ticker-container">
-        <div class="ticker">
-            {% for coin_id, data in market_data.items|slice:":10" %}
-                <span class="ticker-item" data-coin="{{ coin_id }}">
-                    {{ coin_id|capitalize_value }}: <span class="price-slide" data-coin="{{ coin_id }}">${{ data.usd|format_currency }}</span>
-                    <span class="{% if data.usd_24h_change >= 0 %}positive{% else %}negative{% endif %}">
-                        ({{ data.usd_24h_change|floatformat:2 }}%)
-                    </span>
-                </span>
-            {% endfor %}
+    <div class="ticker-container" role="banner" aria-label="Live cryptocurrency prices">
+        <div class="ticker" id="priceTicker">
+            <div class="d-flex justify-content-center align-items-center w-100 h-100">
+                <div class="spinner me-2"></div>
+                <span>Loading market data...</span>
+            </div>
         </div>
     </div>
 
     <!-- Main Content -->
-    <div class="container mt-4">
+    <main class="container-fluid px-3 px-md-4">
+        <div id="errorBoundary" class="error-message" style="display: none;">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Something went wrong.</strong> Please refresh the page or try again later.
+            <button class="btn btn-sm btn-outline-danger ms-2" onclick="location.reload()">Refresh</button>
+        </div>
+
         {% if messages %}
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3 fade-in" role="alert" data-auto-dismiss="5000">
+                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
@@ -142,136 +438,463 @@
         {% endif %}
 
         {% block content %}{% endblock %}
-    </div>
+    </main>
 
-    <!-- Sentiment Widget -->
-    <div class="container mt-4 sentiment-widget">
-        <h5>Market Sentiment</h5>
-        <div class="sentiment-score">
-            <span>Sentiment: <strong id="sentiment-score">Neutral</strong></span>
-            <div class="progress">
-                <div id="sentiment-bar" class="progress-bar bg-warning" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+    <!-- Market Sentiment Widget -->
+    <aside class="container mt-4" aria-label="Market sentiment indicator">
+        <div class="enhanced-card">
+            <div class="card-header">
+                <h6 class="card-title mb-0"><i class="fas fa-chart-pie me-2"></i>Market Sentiment</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-bold" id="sentiment-score">Loading...</span>
+                    <small class="text-muted" id="sentimentLastUpdate">Updated: --</small>
+                </div>
+                <div class="progress" style="height: 8px;">
+                    <div id="sentiment-bar" class="progress-bar" role="progressbar"
+                         style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between mt-1">
+                    <small class="text-danger">Fear</small>
+                    <small class="text-warning">Neutral</small>
+                    <small class="text-success">Greed</small>
+                </div>
             </div>
         </div>
-    </div>
+    </aside>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white text-center py-3 mt-5">
+    <footer class="bg-dark text-white mt-5 py-4" role="contentinfo">
         <div class="container">
-            <p>&copy; {% now "Y" %} Crypto Tracker. All rights reserved.</p>
-            <ul class="list-inline">
-                <li class="list-inline-item"><a href="{% url 'about' %}" class="text-white">About</a></li>
-                <li class="list-inline-item"><a href="{% url 'contact' %}" class="text-white">Contact</a></li>
-                <li class="list-inline-item"><a href="{% url 'terms' %}" class="text-white">Terms</a></li>
-                <li class="list-inline-item"><a href="{% url 'privacy' %}" class="text-white">Privacy</a></li>
-            </ul>
-            <div class="social-links mt-2">
-                <a href="https://twitter.com" class="text-white me-2"><i class="fab fa-twitter"></i></a>
-                <a href="https://github.com" class="text-white me-2"><i class="fab fa-github"></i></a>
-                <a href="https://linkedin.com" class="text-white"><i class="fab fa-linkedin"></i></a>
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-chart-line me-2"></i>Crypto Tracker</h5>
+                    <p class="mb-3">Your ultimate cryptocurrency tracking companion.</p>
+                    <div class="social-links">
+                        <a href="https://twitter.com" class="text-white me-3" aria-label="Follow us on Twitter" target="_blank" rel="noopener">
+                            <i class="fab fa-twitter fa-lg"></i>
+                        </a>
+                        <a href="https://github.com" class="text-white me-3" aria-label="View our GitHub" target="_blank" rel="noopener">
+                            <i class="fab fa-github fa-lg"></i>
+                        </a>
+                        <a href="https://linkedin.com" class="text-white" aria-label="Connect on LinkedIn" target="_blank" rel="noopener">
+                            <i class="fab fa-linkedin fa-lg"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-6">
+                            <h6>Quick Links</h6>
+                            <ul class="list-unstyled">
+                                <li><a href="{% url 'about' %}" class="text-white-50">About Us</a></li>
+                                <li><a href="{% url 'contact' %}" class="text-white-50">Contact</a></li>
+                                <li><a href="{% url 'terms' %}" class="text-white-50">Terms of Service</a></li>
+                                <li><a href="{% url 'privacy' %}" class="text-white-50">Privacy Policy</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-6">
+                            <h6>Features</h6>
+                            <ul class="list-unstyled">
+                                <li><span class="text-white-50">Real-time Tracking</span></li>
+                                <li><span class="text-white-50">Portfolio Management</span></li>
+                                <li><span class="text-white-50">Price Alerts</span></li>
+                                <li><span class="text-white-50">Technical Analysis</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="text-center">
+                <p class="mb-0">&copy; {% now "Y" %} Crypto Tracker. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{% static 'js/scripts.js' %}"></script>
+    <!-- Scripts (deferred for performance) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="https://s3.tradingview.com/tv.js"></script>
+    <script defer src="{% static 'js/scripts.js' %}"></script>
+
     <script>
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-        const icon = themeToggle.querySelector('i');
+        class CryptoTracker {
+            constructor() {
+                this.isOnline = navigator.onLine;
+                this.updateInterval = null;
+                this.retryCount = 0;
+                this.maxRetries = 3;
+                this.lastUpdateTime = null;
+                this.priceCache = new Map();
 
-        themeToggle.addEventListener('click', () => {
-            if (body.dataset.theme === 'dark') {
-                body.dataset.theme = 'light';
-                icon.classList.replace('fa-moon', 'fa-sun');
-                document.documentElement.style.setProperty('--bg-color', '#f8f9fa');
-                document.documentElement.style.setProperty('--text-color', '#212529');
-                document.documentElement.style.setProperty('--navbar-bg', '#ffffff');
-                document.documentElement.style.setProperty('--navbar-text', '#212529');
-            } else {
-                body.dataset.theme = 'dark';
-                icon.classList.replace('fa-sun', 'fa-moon');
-                document.documentElement.style.setProperty('--bg-color', '#212529');
-                document.documentElement.style.setProperty('--text-color', '#f8f9fa');
-                document.documentElement.style.setProperty('--navbar-bg', '#343a40');
-                document.documentElement.style.setProperty('--navbar-text', '#f8f9fa');
+                this.init();
             }
-            localStorage.setItem('theme', body.dataset.theme);
-        });
 
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        body.dataset.theme = savedTheme;
-        icon.classList.add(savedTheme === 'dark' ? 'fa-moon' : 'fa-sun');
-        document.documentElement.style.setProperty('--bg-color', savedTheme === 'dark' ? '#212529' : '#f8f9fa');
-        document.documentElement.style.setProperty('--text-color', savedTheme === 'dark' ? '#f8f9fa' : '#212529');
-        document.documentElement.style.setProperty('--navbar-bg', savedTheme === 'dark' ? '#343a40' : '#ffffff');
-        document.documentElement.style.setProperty('--navbar-text', savedTheme === 'dark' ? '#f8f9fa' : '#212529');
+            init() {
+                this.setupEventListeners();
+                this.initTheme();
+                this.hideLoadingScreen();
+                this.startRealTimeUpdates();
+                this.setupSearchAutocomplete();
+                this.setupAutoMessageDismiss();
+            }
 
-        // Real-time ticker and alerts updates
-        function updateTickerAndAlerts() {
-            fetch('{% url 'market_data_api' %}')
-                .then(response => response.json())
-                .then(data => {
-                    const ticker = document.querySelector('.ticker');
-                    ticker.innerHTML = '';
-                    Object.entries(data.market_data).slice(0, 10).forEach(([coin, info], index) => {
-                        const item = document.createElement('span');
-                        item.className = 'ticker-item';
-                        item.dataset.coin = coin;
-                        item.innerHTML = `
-                            ${coin.charAt(0).toUpperCase() + coin.slice(1)}: 
-                            <span class="price-slide" data-coin="${coin}">$${info.usd.toFixed(2)}</span>
-                            <span class="${info.usd_24h_change >= 0 ? 'positive' : 'negative'}">
-                                (${info.usd_24h_change.toFixed(2)}%)
-                            </span>
-                        `;
-                        ticker.appendChild(item);
-                        setTimeout(() => {
-                            item.querySelector('.price-slide').style.animation = 'none';
-                            item.querySelector('.price-slide').offsetHeight;
-                            item.querySelector('.price-slide').style.animation = 'slideInRight 0.5s ease-out forwards';
-                        }, index * 100);
-                        item.addEventListener('click', () => {
-                            window.location.href = `/live-charts/?coin=${coin}`;
-                        });
-                    });
+            setupEventListeners() {
+                window.addEventListener('online', () => this.handleConnectionChange(true));
+                window.addEventListener('offline', () => this.handleConnectionChange(false));
+                window.addEventListener('error', (e) => this.handleError(e));
+                window.addEventListener('unhandledrejection', (e) => this.handleError(e));
 
-                    const sentimentScore = document.getElementById('sentiment-score');
-                    const sentimentBar = document.getElementById('sentiment-bar');
-                    sentimentScore.textContent = data.sentiment.label;
-                    sentimentBar.style.width = `${data.sentiment.score * 100}%`;
-                    sentimentBar.classList.remove('bg-success', 'bg-danger', 'bg-warning');
-                    sentimentBar.classList.add(
-                        data.sentiment.score > 0.6 ? 'bg-success' :
-                        data.sentiment.score < 0.4 ? 'bg-danger' : 'bg-warning'
-                    );
+                const themeToggle = document.getElementById('themeToggle');
+                if (themeToggle) {
+                    themeToggle.addEventListener('click', () => this.toggleTheme());
+                }
 
+                const ticker = document.querySelector('.ticker');
+                if (ticker) {
+                    ticker.addEventListener('mouseenter', () => ticker.style.animationPlayState = 'paused');
+                    ticker.addEventListener('mouseleave', () => ticker.style.animationPlayState = 'running');
+                }
+            }
+
+            initTheme() {
+                const savedTheme = localStorage.getItem('theme') || 'dark';
+                this.setTheme(savedTheme);
+            }
+
+            setTheme(theme) {
+                document.documentElement.dataset.theme = theme;
+                const icon = document.querySelector('#themeToggle i');
+                if (icon) {
+                    icon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+                }
+                localStorage.setItem('theme', theme);
+            }
+
+            toggleTheme() {
+                const currentTheme = document.documentElement.dataset.theme;
+                this.setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+            }
+
+            hideLoadingScreen() {
+                setTimeout(() => {
+                    const loadingScreen = document.getElementById('loadingScreen');
+                    if (loadingScreen) {
+                        loadingScreen.style.opacity = '0';
+                        setTimeout(() => loadingScreen.remove(), 300);
+                    }
+                }, 1000);
+            }
+
+            handleConnectionChange(isOnline) {
+                this.isOnline = isOnline;
+                const connectionStatus = document.getElementById('connectionStatus');
+                if (isOnline) {
+                    connectionStatus.style.display = 'none';
+                    this.startRealTimeUpdates();
+                } else {
+                    connectionStatus.style.display = 'block';
+                    clearInterval(this.updateInterval);
+                }
+            }
+
+            handleError(error) {
+                console.error('Application error:', error);
+                const errorBoundary = document.getElementById('errorBoundary');
+                if (errorBoundary && this.retryCount < this.maxRetries) {
+                    errorBoundary.style.display = 'block';
+                    setTimeout(() => errorBoundary.style.display = 'none', 5000);
+                }
+            }
+
+            async fetchWithRetry(url, options = {}) {
+                for (let i = 0; i <= this.maxRetries; i++) {
+                    try {
+                        const response = await fetch(url, { ...options, timeout: 10000 });
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        return response;
+                    } catch (error) {
+                        if (i === this.maxRetries) throw error;
+                        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+                    }
+                }
+            }
+
+            startRealTimeUpdates() {
+                if (!this.isOnline) return;
+                this.updateTickerAndSentiment();
+                if (this.updateInterval) clearInterval(this.updateInterval);
+                this.updateInterval = setInterval(() => this.updateTickerAndSentiment(), 30000);
+            }
+
+            async updateTickerAndSentiment() {
+                try {
+                    const response = await this.fetchWithRetry('{% url "market_data_api" %}');
+                    const data = await response.json();
+                    this.updateTicker(data.market_data);
+                    this.updateSentiment(data.sentiment);
                     {% if user.is_authenticated %}
-                        fetch('{% url 'alerts_api' %}')
-                            .then(response => response.json())
-                            .then(alerts => {
-                                const alertsList = document.getElementById('alertsList');
-                                const alertCount = document.getElementById('alertCount');
-                                alertCount.textContent = alerts.length;
-                                alertsList.innerHTML = alerts.length ? 
-                                    alerts.slice(0, 5).map(alert => `
-                                        <li><a class="dropdown-item" href="{% url 'alerts' %}">
-                                            ${alert.cryptocurrency.charAt(0).toUpperCase() + alert.cryptocurrency.slice(1)}: 
-                                            ${alert.condition} $${alert.target_price.toFixed(2)}
-                                        </a></li>
-                                    `).join('') :
-                                    '<li><a class="dropdown-item" href="{% url 'alerts' %}">No active alerts</a></li>';
-                            })
-                            .catch(error => console.error('Error fetching alerts:', error));
+                        await this.updateAlerts();
                     {% endif %}
-                })
-                .catch(error => console.error('Error updating ticker:', error));
+                    this.lastUpdateTime = new Date();
+                    this.retryCount = 0;
+                } catch (error) {
+                    console.error('Error updating data:', error);
+                    this.retryCount++;
+                    if (this.retryCount >= this.maxRetries) {
+                        this.handleError(error);
+                    }
+                }
+            }
+
+            updateTicker(marketData) {
+                const ticker = document.getElementById('priceTicker');
+                if (!ticker || !marketData) return;
+
+                const items = Object.entries(marketData).slice(0, 10).map(([coin_id, info]) => {
+                    const oldPrice = this.priceCache.get(coin_id);
+                    const newPrice = info.usd;
+                    const change = info.usd_24h_change;
+                    this.priceCache.set(coin_id, newPrice);
+
+                    const animationClass = oldPrice && oldPrice !== newPrice
+                        ? newPrice > oldPrice ? 'price-up' : 'price-down'
+                        : '';
+
+                    return `
+                        <div class="ticker-item ${animationClass}" data-coin="${coin_id}" onclick="window.location.href='/live-charts/?coin=${coin_id}'">
+                            <img src="https://cryptoicons.org/api/icon/${coin_id}/24"
+                                 alt="${info.name}"
+                                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTIiIGZpbGw9IiMzMzMzMzMiLz4KPHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTYgMEM2IDAgNiAwIDYgMFMxMiA2IDEyIDZTNCAxMiA2IDEyUzAgNiAwIDZTNCAwIDYgMFoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo8L3N2Zz4K'"
+                                 class="rounded-circle">
+                            <span>${info.name}: $${newPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 6})}</span>
+                            <span class="${change >= 0 ? 'positive' : 'negative'} ms-2">
+                                <i class="fas fa-caret-${change >= 0 ? 'up' : 'down'}"></i>
+                                ${change.toFixed(2)}%
+                            </span>
+                        </div>
+                    `;
+                }).join('');
+
+                ticker.style.opacity = '0.7';
+                setTimeout(() => {
+                    ticker.innerHTML = items;
+                    ticker.style.opacity = '1';
+                }, 150);
+            }
+
+            updateSentiment(sentiment) {
+                if (!sentiment) return;
+                const scoreElement = document.getElementById('sentiment-score');
+                const barElement = document.getElementById('sentiment-bar');
+                const updateElement = document.getElementById('sentimentLastUpdate');
+
+                if (scoreElement) {
+                    scoreElement.textContent = sentiment.label || 'Neutral';
+                }
+                if (barElement && typeof sentiment.score === 'number') {
+                    const percentage = Math.round(sentiment.score * 100);
+                    barElement.style.width = `${percentage}%`;
+                    barElement.setAttribute('aria-valuenow', percentage);
+                    barElement.className = 'progress-bar ' +
+                        (sentiment.score > 0.6 ? 'bg-success' :
+                         sentiment.score < 0.4 ? 'bg-danger' : 'bg-warning');
+                }
+                if (updateElement) {
+                    updateElement.textContent = `Updated: ${new Date().toLocaleTimeString()}`;
+                }
+            }
+
+            async updateAlerts() {
+                try {
+                    const response = await this.fetchWithRetry('{% url "alerts_api" %}');
+                    const alerts = await response.json();
+                    const alertsList = document.getElementById('alertsList');
+                    const alertCount = document.getElementById('alertCount');
+
+                    if (alertCount) {
+                        alertCount.textContent = alerts.length;
+                        alertCount.style.display = alerts.length > 0 ? 'block' : 'none';
+                    }
+
+                    if (alertsList) {
+                        const alertsHtml = alerts.length ? `
+                            <li><h6 class="dropdown-header">Recent Alerts (${alerts.length})</h6></li>
+                            <li><hr class="dropdown-divider"></li>
+                            ${alerts.slice(0, 5).map(alert => `
+                                <li>
+                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'alerts' %}">
+                                        <div>
+                                            <strong>${alert.cryptocurrency.charAt(0).toUpperCase() + alert.cryptocurrency.slice(1)}</strong><br>
+                                            <small class="text-muted">${alert.condition} $${parseFloat(alert.target_price).toLocaleString()}</small>
+                                        </div>
+                                        <span class="badge bg-${alert.is_triggered ? 'success' : 'warning'}">
+                                            ${alert.is_triggered ? 'Triggered' : 'Active'}
+                                        </span>
+                                    </a>
+                                </li>
+                            `).join('')}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-center fw-bold" href="{% url 'alerts' %}">View All Alerts</a></li>
+                        ` : `
+                            <li><h6 class="dropdown-header">Recent Alerts</h6></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li class="px-3 py-2 text-muted text-center">
+                                <i class="fas fa-bell-slash me-2"></i>No active alerts
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-center" href="{% url 'alerts' %}">Create Alert</a></li>
+                        `;
+                        alertsList.innerHTML = alertsHtml;
+                    }
+                } catch (error) {
+                    console.error('Error fetching alerts:', error);
+                }
+            }
+
+            setupSearchAutocomplete() {
+                const searchInput = document.getElementById('searchInput');
+                const searchSuggestions = document.getElementById('searchSuggestions');
+                if (!searchInput || !searchSuggestions) return;
+
+                let searchTimeout;
+                const commonCryptos = [
+                    'bitcoin', 'ethereum', 'binancecoin', 'cardano', 'solana',
+                    'xrp', 'polkadot', 'dogecoin', 'avalanche', 'chainlink'
+                ];
+
+                searchInput.addEventListener('input', (e) => {
+                    clearTimeout(searchTimeout);
+                    const query = e.target.value.trim();
+                    if (query.length < 2) {
+                        searchSuggestions.style.display = 'none';
+                        return;
+                    }
+
+                    searchTimeout = setTimeout(() => {
+                        const matches = commonCryptos
+                            .filter(crypto => crypto.toLowerCase().includes(query.toLowerCase()))
+                            .slice(0, 5);
+                        if (matches.length > 0) {
+                            searchSuggestions.innerHTML = matches
+                                .map(crypto => `
+                                    <li><a class="dropdown-item" href="/live-charts/?coin=${crypto}">
+                                        <i class="fas fa-search me-2"></i>${crypto.charAt(0).toUpperCase() + crypto.slice(1)}
+                                    </a></li>
+                                `).join('');
+                            searchSuggestions.style.display = 'block';
+                        } else {
+                            searchSuggestions.style.display = 'none';
+                        }
+                    }, 300);
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
+                        searchSuggestions.style.display = 'none';
+                    }
+                });
+
+                searchInput.addEventListener('keydown', (e) => {
+                    const items = searchSuggestions.querySelectorAll('.dropdown-item');
+                    if (items.length === 0) return;
+
+                    let activeItem = searchSuggestions.querySelector('.dropdown-item.active');
+                    let activeIndex = activeItem ? Array.from(items).indexOf(activeItem) : -1;
+
+                    switch (e.key) {
+                        case 'ArrowDown':
+                            e.preventDefault();
+                            activeIndex = (activeIndex + 1) % items.length;
+                            break;
+                        case 'ArrowUp':
+                            e.preventDefault();
+                            activeIndex = activeIndex <= 0 ? items.length - 1 : activeIndex - 1;
+                            break;
+                        case 'Enter':
+                            if (activeItem) {
+                                e.preventDefault();
+                                activeItem.click();
+                                return;
+                            }
+                            break;
+                        case 'Escape':
+                            searchSuggestions.style.display = 'none';
+                            return;
+                    }
+
+                    items.forEach((item, index) => {
+                        item.classList.toggle('active', index === activeIndex);
+                    });
+                });
+            }
+
+            setupAutoMessageDismiss() {
+                const alerts = document.querySelectorAll('.alert[data-auto-dismiss]');
+                alerts.forEach(alert => {
+                    const dismissTime = parseInt(alert.dataset.autoDismiss);
+                    setTimeout(() => {
+                        if (alert.parentNode) {
+                            alert.style.opacity = '0';
+                            setTimeout(() => alert.remove(), 300);
+                        }
+                    }, dismissTime);
+                });
+            }
+
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+
+            destroy() {
+                if (this.updateInterval) {
+                    clearInterval(this.updateInterval);
+                }
+            }
         }
 
-        setInterval(updateTickerAndAlerts, 30000);
-        updateTickerAndAlerts();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                window.cryptoTracker = new CryptoTracker();
+            });
+        } else {
+            window.cryptoTracker = new CryptoTracker();
+        }
+
+        window.addEventListener('beforeunload', () => {
+            if (window.cryptoTracker) {
+                window.cryptoTracker.destroy();
+            }
+        });
+    </script>
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Crypto Tracker",
+        "description": "Real-time cryptocurrency tracking and portfolio management",
+        "url": "{% url 'home' %}",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        }
+    }
     </script>
 </body>
-
 </html>

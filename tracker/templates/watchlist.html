@@ -4,51 +4,318 @@
 {% block title %}Watchlist - Crypto Tracker{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2>Watchlist</h2>
+<style>
+    /* Enhanced Watchlist Styles */
+    :root {
+        --portfolio-primary: #667eea;
+        --portfolio-success: #00d4aa;
+        --portfolio-danger: #ff6b6b;
+        --portfolio-warning: #feca57;
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --card-border-radius: 16px;
+    }
 
-    <form method="post" action="{% url 'add_to_watchlist' %}">
-        {% csrf_token %}
-        <label for="cryptocurrency">Cryptocurrency:</label>
-        <input type="text" name="cryptocurrency" id="cryptocurrency" placeholder="e.g., bitcoin" required>
-        <button type="submit">Add to Watchlist</button>
-    </form>
+    /* Enhanced Card */
+    .enhanced-card {
+        background: white;
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--card-shadow);
+        border: none;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
 
-    <div class="card mt-4 glow-effect">
-        <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-star"></i> Your Watchlist</h3>
-        </div>
-        <div class="card-body">
-            {% if watchlist %}
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Cryptocurrency</th>
-                                <th>Current Price (USD)</th>
-                                <th>24h Change</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in watchlist %}
-                                <tr>
-                                    <td>{{ item.cryptocurrency|default:"Unknown" }}</td>
-                                    <td>${{ item.current_price|default:"0.00"|format_currency }}</td>
-                                    <td>
-                                        <span class="{% if item.usd_24h_change|default:0.0 >= 0 %}positive{% else %}negative{% endif %}">
-                                            {% if item.usd_24h_change|default:0.0 >= 0 %}▲{% else %}▼{% endif %}
-                                            {{ item.usd_24h_change|default:0.0|abs_value|floatformat:2 }}%
-                                        </span>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+    .enhanced-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .enhanced-card .card-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-bottom: 1px solid #dee2e6;
+        padding: 1rem 1.5rem;
+    }
+
+    /* Table Styling */
+    .watchlist-table {
+        font-size: 0.95rem;
+    }
+
+    .watchlist-table th {
+        background: #f8f9fa;
+        border-top: none;
+        font-weight: 600;
+        padding: 1rem 0.75rem;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .watchlist-table th.sortable {
+        cursor: pointer;
+        user-select: none;
+        transition: background-color 0.2s ease;
+    }
+
+    .watchlist-table th.sortable:hover {
+        background-color: #e9ecef;
+    }
+
+    .watchlist-row {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .watchlist-row:hover {
+        background-color: rgba(102, 126, 234, 0.05) !important;
+        transform: translateX(3px);
+    }
+
+    /* Form Styling */
+    .watchlist-form {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-end;
+        margin-bottom: 1.5rem;
+    }
+
+    .watchlist-form .form-group {
+        flex: 1;
+    }
+
+    .watchlist-form .form-control {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        padding: 0.5rem 1rem;
+    }
+
+    .watchlist-form .form-control:focus {
+        border-color: var(--portfolio-primary);
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    .watchlist-form .btn {
+        border-radius: 8px;
+        padding: 0.5rem 1.5rem;
+    }
+
+    /* Positive/Negative Change */
+    .positive {
+        color: var(--portfolio-success);
+    }
+
+    .negative {
+        color: var(--portfolio-danger);
+    }
+
+    /* Empty State */
+    .empty-state {
+        padding: 3rem 1rem;
+        text-align: center;
+    }
+
+    .empty-icon {
+        opacity: 0.3;
+    }
+
+    /* Responsive Improvements */
+    @media (max-width: 768px) {
+        .watchlist-form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .watchlist-table {
+            font-size: 0.85rem;
+        }
+
+        .table-responsive {
+            border-radius: 8px;
+        }
+    }
+
+    /* Dark Mode Support */
+    @media (prefers-color-scheme: dark) {
+        .enhanced-card {
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .watchlist-table th {
+            background: #2c2c2c;
+        }
+
+        .watchlist-form .form-control {
+            background: #2c2c2c;
+            color: #ffffff;
+            border-color: #444;
+        }
+
+        .empty-state {
+            color: #ffffff;
+        }
+
+        .empty-state .text-muted {
+            color: #aaaaaa !important;
+        }
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Watchlist Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="mb-0">
+                    <i class="fas fa-star me-2 text-primary"></i>
+                    Your Watchlist
+                </h2>
+                <div class="watchlist-actions">
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addWatchlistModal">
+                        <i class="fas fa-plus me-1"></i>Add Asset
+                    </button>
                 </div>
-            {% else %}
-                <p class="text-center">Your watchlist is empty. Add cryptocurrencies above.</p>
-            {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Watchlist Content -->
+    <div class="row">
+        <div class="col-12">
+            <div class="enhanced-card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-star me-2"></i>Watchlist
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if watchlist %}
+                        <div class="table-responsive">
+                            <table class="table table-hover watchlist-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" data-sort="name">
+                                            Cryptocurrency
+                                            <i class="fas fa-sort ms-1"></i>
+                                        </th>
+                                        <th class="sortable text-end" data-sort="current_price">
+                                            Current Price (USD)
+                                            <i class="fas fa-sort ms-1"></i>
+                                        </th>
+                                        <th class="sortable text-end" data-sort="usd_24h_change">
+                                            24h Change
+                                            <i class="fas fa-sort ms-1"></i>
+                                        </th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="watchlistTableBody">
+                                    {% for item in watchlist %}
+                                        <tr class="watchlist-row" data-crypto="{{ item.cryptocurrency }}">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="crypto-icon me-3">
+                                                        <img src="https://cryptoicons.org/api/icon/{{ item.cryptocurrency }}/32"
+                                                             alt="{{ item.cryptocurrency }}"
+                                                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiMzMzMzMzMiLz4KPHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTggMEM4IDAgOCAwIDggMFM1NiA4IDE2IDhTOCAxNiA4IDE2UzAgOCAwIDhTOCAwIDggMFoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo8L3N2Zz4K'"
+                                                             class="rounded-circle"
+                                                             loading="lazy">
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold">{{ item.cryptocurrency|default:"Unknown"|capitalize_value }}</div>
+                                                        <small class="text-muted">{{ item.cryptocurrency|upper }}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-end">
+                                                <div class="fw-bold price-cell" data-crypto="{{ item.cryptocurrency }}">
+                                                    ${{ item.current_price|default:"0.00"|format_currency }}
+                                                </div>
+                                            </td>
+                                            <td class="text-end">
+                                                <span class="{% if item.usd_24h_change|default:0.0 >= 0 %}positive{% else %}negative{% endif %}">
+                                                    {% if item.usd_24h_change|default:0.0 >= 0 %}▲{% else %}▼{% endif %}
+                                                    {{ item.usd_24h_change|default:0.0|abs_value|floatformat:2 }}%
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <button class="btn btn-outline-danger btn-sm" onclick="removeWatchlistItem('{{ item.cryptocurrency }}')" title="Remove">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <div class="empty-icon mb-3">
+                                <i class="fas fa-star fa-4x text-muted"></i>
+                            </div>
+                            <h5 class="text-muted">Your watchlist is empty</h5>
+                            <p class="text-muted mb-4">Add cryptocurrencies to track their performance.</p>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWatchlistModal">
+                                <i class="fas fa-plus me-2"></i>Add Your First Asset
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Add Watchlist Item Modal -->
+<div class="modal fade" id="addWatchlistModal" tabindex="-1" aria-labelledby="addWatchlistModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addWatchlistModalLabel">
+                    <i class="fas fa-plus me-2"></i>Add to Watchlist
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'add_to_watchlist' %}" id="watchlistForm">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="cryptocurrency" class="form-label">Cryptocurrency</label>
+                        <input type="text" class="form-control" name="cryptocurrency" id="cryptocurrency"
+                               placeholder="e.g., bitcoin, ethereum" required autocomplete="off">
+                        <div class="invalid-feedback">Please enter a valid cryptocurrency name.</div>
+                        <small class="form-text text-muted">Start typing to see suggestions</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitWatchlistBtn">
+                        <i class="fas fa-plus me-1"></i>Add to Watchlist
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal for Removal -->
+<div class="modal fade" id="confirmWatchlistModal" tabindex="-1" aria-labelledby="confirmWatchlistModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmWatchlistModalLabel">Confirm Removal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                <p id="confirmWatchlistMessage">Are you sure you want to remove this asset?</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmWatchlistBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
