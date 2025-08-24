@@ -7,7 +7,7 @@ from functools import wraps
 
 logger = logging.getLogger(__name__)
 
-def rate_limit_handler(max_retries=3, base_delay=20):
+def rate_limit_handler(max_retries=5, base_delay=60):
     """Decorator to handle rate limiting with exponential backoff"""
     def decorator(func):
         @wraps(func)
@@ -23,7 +23,7 @@ def rate_limit_handler(max_retries=3, base_delay=20):
                             time.sleep(delay)
                             continue
                         else:
-                            logger.error(f"Max retries exceeded for {func.__name__}. Rate limit still active.")
+                            logger.error(f"Max retries ({max_retries}) exceeded for {func.__name__}. Rate limit still active.")
                             return None
                     else:
                         raise e
@@ -34,11 +34,11 @@ def rate_limit_handler(max_retries=3, base_delay=20):
         return wrapper
     return decorator
 
-@rate_limit_handler(max_retries=3, base_delay=20)
+@rate_limit_handler(max_retries=5, base_delay=60)
 def fetch_market_data():
     """
     Fetch market data with caching and rate limit handling.
-    Cache results for 5 minutes to reduce API calls.
+    Cache results for 10 minutes to reduce API calls.
     """
     # Check cache first
     cached_data = cache.get('market_data')
@@ -47,7 +47,6 @@ def fetch_market_data():
         return cached_data
     
     try:
-        # Add timeout to prevent worker timeouts
         url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false"
         response = requests.get(url, timeout=30)
         logger.debug(f"CoinGecko API response status: {response.status_code}")
@@ -68,8 +67,8 @@ def fetch_market_data():
             } for coin in data if 'id' in coin and 'current_price' in coin
         }
         
-        # Cache for 5 minutes
-        cache.set('market_data', market_data, timeout=300)
+        # Cache for 10 minutes (increased from 5 to reduce API calls)
+        cache.set('market_data', market_data, timeout=600)
         logger.info(f"Fetched and cached {len(market_data)} coins for market data")
         return market_data
         
