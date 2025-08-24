@@ -1,8 +1,7 @@
 import logging
 import time
-from typing import Dict, List, Optional, Union
+from typing import Dict, Optional
 from functools import wraps
-from datetime import datetime, timedelta
 import json
 
 import requests
@@ -10,14 +9,11 @@ from django.core.cache import cache
 from django.conf import settings
 from django.http import HttpResponseForbidden
 
-# Try to import vaderSentiment, handle if missing
-try:
-    from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-    VADER_AVAILABLE = True
-except ImportError:
-    VADER_AVAILABLE = False
-    logger.warning("vaderSentiment not installed. Sentiment analysis disabled.")
-
+# Explicitly configure logging to avoid 'logger not defined'
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 class BlockWpAdminMiddleware:
@@ -142,10 +138,6 @@ def _get_fallback_data(func_name: str) -> Optional[Dict]:
                 "sentiment": "ERROR - No Real Data"
             }
         }
-    elif func_name == 'fetch_news':
-        return []
-    elif func_name == 'fetch_sentiment':
-        return {"score": 0.5, "label": "Neutral"}
     return None
 
 @adaptive_rate_limit_handler(max_retries=3, base_delay=45)
@@ -277,159 +269,12 @@ def fetch_market_data(diagnostic_mode: bool = False, min_coins: int = 30) -> Opt
         logger.error(f"Unexpected error fetching market data: {e}", exc_info=True)
         return cached_data if cached_data and len(cached_data) >= min_coins else _get_fallback_data('fetch_market_data')
 
-@adaptive_rate_limit_handler(max_retries=2, base_delay=10)
-def fetch_valid_coins() -> List[str]:
-    """Fetch valid cryptocurrency IDs from CoinGecko"""
-    if valid_coins := cache.get('valid_coins'):
-        return valid_coins
-
-    try:
-        url = ("https://pro-api.coingecko.com/api/v3/coins/list"
-               if hasattr(settings, 'COINGECKO_API_KEY') else
-               "https://api.coingecko.com/api/v3/coins/list")
-        headers = {'x-cg-pro-api-key': settings.COINGECKO_API_KEY} if hasattr(settings, 'COINGECKO_API_KEY') else {}
-
-        response = requests.get(url, headers=headers, timeout=30)
-        response.raise_for_status()
-
-        valid_coins = [coin['id'].lower() for coin in response.json() if 'id' in coin]
-        cache.set('valid_coins', valid_coins, timeout=86400)
-        return valid_coins
-
-    except Exception as e:
-        logger.error(f"Error fetching valid coins: {e}", exc_info=True)
-        return ['bitcoin', 'ethereum', 'binancecoin', 'cardano', 'solana']
-
-@adaptive_rate_limit_handler(max_retries=2, base_delay=10)
-def fetch_news() -> List[Dict]:
-    """Fetch cryptocurrency news from NewsAPI"""
-    if cached_news := cache.get('crypto_news'):
-        if cache_age := cache.get('crypto_news_timestamp'):
-            if (time.time() - cache_age) < 1800:
-                return cached_news
-
-    try:
-        if not hasattr(settings, 'NEWSAPI_KEY') or not settings.NEWSAPI_KEY:
-            logger.warning("NewsAPI key not configured")
-            return []
-
-        response = requests.get(
-            "https://newsapi.org/v2/everything",
-            params={
-                'q': 'cryptocurrency OR bitcoin OR ethereum',
-                'apiKey': settings.NEWSAPI_KEY,
-                'language': 'en',
-                'sortBy': 'publishedAt',
-                'pageSize': 20,
-                'from': (datetime.now() - timedelta(days=1)).isoformat()
-            },
-            timeout=30
-        )
-        response.raise_for_status()
-
-        articles = response.json().get('articles', [])
-        news_data = [
-            {
-                "title": article["title"],
-                "source": article.get("source", {}).get("name", "Unknown"),
-                "published_at": article.get("publishedAt", ""),
-                "url": article.get("url", ""),
-                "description": article.get("description") or "",
-                "sentiment": analyze_article_sentiment(
-                    article["title"] + " " + (article.get("description") or "")
-                )
-            }
-            for article in articles
-            if article.get('title') and article.get('title') != '[Removed]'
-        ]
-
-        cache.set('crypto_news', news_data, timeout=1800)
-        cache.set('crypto_news_timestamp', time.time(), timeout=1800)
-        return news_data
-
-    except Exception as e:
-        logger.error(f"Error fetching news: {e}", exc_info=True)
-        return cached_news or []
-
-def analyze_article_sentiment(text: str) -> Dict[str, Union[float, str]]:
-    """Analyze sentiment of article text using VADER if available"""
-    if not VADER_AVAILABLE:
-        logger.warning("Sentiment analysis skipped: vaderSentiment not installed")
-        return {"score": 0.5, "label": "Neutral"}
-
-    if not text or len(text.strip()) < 10:
-        return {"score": 0.5, "label": "Neutral"}
-
-    try:
-        analyzer = SentimentIntensityAnalyzer()
-        score = (analyzer.polarity_scores(text)['compound'] + 1) / 2
-
-        label = ("Very Positive" if score > 0.65 else
-                 "Positive" if score > 0.55 else
-                 "Neutral" if score > 0.45 else
-                 "Negative" if score > 0.35 else
-                 "Very Negative")
-
-        return {"score": round(score, 3), "label": label}
-    except Exception as e:
-        logger.error(f"Error analyzing sentiment: {e}", exc_info=True)
-        return {"score": 0.5, "label": "Neutral"}
-
-@adaptive_rate_limit_handler(max_retries=2, base_delay=10)
-def fetch_sentiment() -> Dict[str, Union[float, str, int]]:
-    """Calculate overall market sentiment based on news articles"""
-    if cached_sentiment := cache.get('crypto_sentiment'):
-        if cache_age := cache.get('crypto_sentiment_timestamp'):
-            if (time.time() - cache_age) < 600:
-                return cached_sentiment
-
-    try:
-        news = fetch_news()
-        if not news:
-            return {"score": 0.5, "label": "Neutral", "article_count": 0}
-
-        total_weight, weighted_score = 0, 0
-        for article in news:
-            try:
-                pub_time = datetime.fromisoformat(article['published_at'].replace('Z', '+00:00'))
-                hours_old = (datetime.now(pub_time.tzinfo) - pub_time).total_seconds() / 3600
-                weight = max(0.1, 1 - (hours_old / 24))
-            except:
-                weight = 0.5
-
-            weighted_score += article['sentiment']['score'] * weight
-            total_weight += weight
-
-        avg_score = weighted_score / total_weight if total_weight > 0 else 0.5
-        label = ("Very Positive" if avg_score > 0.65 else
-                 "Positive" if avg_score > 0.55 else
-                 "Neutral" if avg_score > 0.45 else
-                 "Negative" if avg_score > 0.35 else
-                 "Very Negative")
-
-        sentiment_data = {
-            "score": round(avg_score, 3),
-            "label": label,
-            "article_count": len(news),
-            "updated_at": datetime.now().isoformat()
-        }
-
-        cache.set('crypto_sentiment', sentiment_data, timeout=600)
-        cache.set('crypto_sentiment_timestamp', time.time(), timeout=600)
-        return sentiment_data
-
-    except Exception as e:
-        logger.error(f"Error computing sentiment: {e}", exc_info=True)
-        return {"score": 0.5, "label": "Neutral", "article_count": 0}
-
 def clear_all_caches() -> None:
     """Clear all cached data and rate limits"""
     cache_keys = [
-        'market_data', 'market_data_timestamp', 'valid_coins', 'crypto_news',
-        'crypto_news_timestamp', 'crypto_sentiment', 'crypto_sentiment_timestamp',
-        'market_data_last_call', 'service_spin_up'
+        'market_data', 'market_data_timestamp', 'market_data_last_call', 'service_spin_up'
     ]
-    for func in ['fetch_market_data', 'fetch_news', 'fetch_sentiment', 'fetch_valid_coins']:
+    for func in ['fetch_market_data']:
         cache_keys.extend([f'lock:{func}', f'{func}_cache', f'{func}_cache_timestamp'])
 
     cache.delete_many(cache_keys)
@@ -438,5 +283,5 @@ def clear_all_caches() -> None:
 def clear_rate_limits() -> None:
     """Clear all active rate limits"""
     logger.warning("Clearing all active rate limits")
-    cache.delete_many([f'rate_limit:fetch_{func}' for func in ['market_data', 'news', 'sentiment']])
+    cache.delete_many([f'rate_limit:fetch_{func}' for func in ['market_data']])
     logger.info("Rate limits cleared")
