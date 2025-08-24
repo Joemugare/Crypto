@@ -4,52 +4,73 @@ import time
 from django.core.cache import cache
 from django.conf import settings
 from functools import wraps
+import os
 
 logger = logging.getLogger(__name__)
 
-def rate_limit_handler(max_retries=5, base_delay=60):
-    """Decorator to handle rate limiting with exponential backoff"""
+def rate_limit_handler(max_retries=5, base_delay=180):
+    """Decorator to handle rate limiting with exponential backoff and cache-based lock"""
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            for attempt in range(max_retries):
-                try:
-                    return func(*args, **kwargs)
-                except requests.exceptions.HTTPError as e:
-                    if e.response.status_code == 429:  # Too Many Requests
-                        if attempt < max_retries - 1:
-                            delay = base_delay * (2 ** attempt)  # Exponential backoff
-                            logger.warning(f"Rate limit hit for {func.__name__}. Retrying in {delay}s... (attempt {attempt + 1}/{max_retries})")
-                            time.sleep(delay)
-                            continue
-                        else:
-                            logger.error(f"Max retries ({max_retries}) exceeded for {func.__name__}. Rate limit still active.")
-                            # Return stale cache data if available
-                            cached_data = cache.get(f"{func.__name__}_cache")
-                            if cached_data is not None:
-                                logger.info(f"Returning stale cache data for {func.__name__} due to rate limit")
-                                return cached_data
-                            return None
-                    else:
-                        raise e
-                except Exception as e:
-                    logger.error(f"Error in {func.__name__}: {e}")
-                    # Return stale cache data if available
-                    cached_data = cache.get(f"{func.__name__}_cache")
-                    if cached_data is not None:
-                        logger.info(f"Returning stale cache data for {func.__name__} due to error")
-                        return cached_data
-                    return None
-            return None
+            lock_key = f"lock:{func.__name__}"
+            acquired_lock = False
+
+            try:
+                # Try to acquire a cache-based lock to prevent concurrent calls
+                if cache.get(lock_key):
+                    logger.warning(f"API call for {func.__name__} locked; waiting for another instance")
+                    time.sleep(10)
+                    return cache.get(f"{func.__name__}_cache") or default_market_data() if func.__name__ == 'fetch_market_data' else None
+                cache.set(lock_key, 1, timeout=120)
+                acquired_lock = True
+
+                for attempt in range(max_retries):
+                    try:
+                        result = func(*args, **kwargs)
+                        return result
+                    except requests.exceptions.HTTPError as e:
+                        if e.response.status_code == 429:  # Too Many Requests
+                            if attempt < max_retries - 1:
+                                delay = base_delay * (2 ** attempt)  # Exponential backoff
+                                logger.warning(f"Rate limit hit for {func.__name__}. Retrying in {delay}s... (attempt {attempt + 1}/{max_retries})")
+                                time.sleep(delay)
+                                continue
+                            else:
+                                logger.error(f"Max retries ({max_retries}) exceeded for {func.__name__}. Rate limit still active.")
+                                cached_data = cache.get(f"{func.__name__}_cache")
+                                if cached_data is not None:
+                                    logger.info(f"Returning stale cache data for {func.__name__} due to rate limit")
+                                    return cached_data
+                                return default_market_data() if func.__name__ == 'fetch_market_data' else None
+                    except Exception as e:
+                        logger.error(f"Error in {func.__name__}: {e}")
+                        cached_data = cache.get(f"{func.__name__}_cache")
+                        if cached_data is not None:
+                            logger.info(f"Returning stale cache data for {func.__name__} due to error")
+                            return cached_data
+                        return default_market_data() if func.__name__ == 'fetch_market_data' else None
+            finally:
+                if acquired_lock:
+                    cache.delete(lock_key)
+            return default_market_data() if func.__name__ == 'fetch_market_data' else None
         return wrapper
     return decorator
 
-@rate_limit_handler(max_retries=5, base_delay=60)
+@rate_limit_handler(max_retries=5, base_delay=180)
 def fetch_market_data():
     """
     Fetch market data with caching and rate limit handling.
-    Cache results for 30 minutes to reduce API calls.
+    Cache results for 2 hours to reduce API calls on Render.
     """
+    # Log service spin-up and delay to avoid rate limits on Render
+    logger.info("Checking service spin-up for fetch_market_data")
+    spin_up_time = cache.get('service_spin_up')
+    if not spin_up_time:
+        cache.set('service_spin_up', time.time(), timeout=3600)
+        logger.info("Service spin-up detected; delaying API call by 30s")
+        time.sleep(30)  # Delay to avoid rate limit on Render spin-up
+    
     # Check cache first
     cached_data = cache.get('market_data')
     if cached_data is not None:
@@ -58,9 +79,9 @@ def fetch_market_data():
     
     # Check last API call time to avoid rate limits
     last_call = cache.get('market_data_last_call')
-    if last_call and (time.time() - last_call) < 60:  # Wait 60s between calls
+    if last_call and (time.time() - last_call) < 180:  # Wait 180s between calls
         logger.warning("Skipping CoinGecko API call due to recent request")
-        return cached_data if cached_data is not None else {}
+        return cached_data if cached_data is not None else default_market_data()
     
     try:
         url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false"
@@ -73,7 +94,7 @@ def fetch_market_data():
         
         if not isinstance(data, list):
             logger.error(f"CoinGecko API returned unexpected data format: {type(data)}")
-            return {}
+            return default_market_data()
         
         market_data = {
             coin['id']: {
@@ -84,22 +105,30 @@ def fetch_market_data():
             } for coin in data if 'id' in coin and 'current_price' in coin
         }
         
-        # Cache for 30 minutes
-        cache.set('market_data', market_data, timeout=1800)
-        cache.set('market_data_last_call', time.time(), timeout=1800)
+        # Cache for 2 hours
+        cache.set('market_data', market_data, timeout=7200)
+        cache.set('market_data_last_call', time.time(), timeout=7200)
         cache.set('fetch_market_data_cache', market_data, timeout=86400)  # Stale cache for 24 hours
         logger.info(f"Fetched and cached {len(market_data)} coins for market data")
         return market_data
         
     except requests.Timeout:
         logger.error("Timeout while fetching market data from CoinGecko")
-        return {}
+        return default_market_data()
     except requests.RequestException as e:
         logger.error(f"Error fetching market data from CoinGecko: {e}")
-        return {}
+        return default_market_data()
     except ValueError as e:
         logger.error(f"Error parsing CoinGecko response: {e}")
-        return {}
+        return default_market_data()
+
+def default_market_data():
+    """Return default market data as a fallback"""
+    logger.warning("Returning default market data due to API failure")
+    return {
+        "bitcoin": {"usd": 0.0, "usd_24h_change": 0.0, "volume_24h": 0.0, "sentiment": "Neutral"},
+        "ethereum": {"usd": 0.0, "usd_24h_change": 0.0, "volume_24h": 0.0, "sentiment": "Neutral"}
+    }
 
 def fetch_valid_coins():
     """
@@ -231,4 +260,4 @@ def fetch_sentiment():
 # Utility function to clear all caches if needed
 def clear_all_caches():
     """Clear all cached data"""
-    cache.delete_many(['market_data', 'valid_coins', 'crypto_news', 'crypto_sentiment'])
+    cache.delete_many(['market_data', 'valid_coins', 'crypto_news', 'crypto_sentiment', 'market_data_last_call', 'fetch_market_data_cache', 'service_spin_up', 'lock:fetch_market_data'])
