@@ -1,4 +1,4 @@
-﻿from pathlib import Path
+from pathlib import Path
 import os
 import environ
 
@@ -294,5 +294,4 @@ LOGIN_REDIRECT_URL = '/'
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 
-# Create logs directory if it doesn't exist
-(BASE_DIR / 'logs').mkdir(exist_ok=True)
+
