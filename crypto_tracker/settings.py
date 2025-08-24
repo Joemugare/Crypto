@@ -35,8 +35,9 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000',
 ]
 
-# Security settings for production
+# Production optimizations
 if not DEBUG:
+    # Security settings
     SECURE_SSL_REDIRECT = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_HSTS_SECONDS = 31536000
@@ -45,6 +46,12 @@ if not DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_BROWSER_XSS_FILTER = True
     X_FRAME_OPTIONS = 'DENY'
+    
+    # Performance settings
+    CONN_MAX_AGE = 60
+    
+    # Disable debug toolbar and other debug features
+    DEBUG_PROPAGATE_EXCEPTIONS = False
 
 # Applications
 INSTALLED_APPS = [
@@ -220,47 +227,74 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Logging Configuration
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '[{levelname}] {asctime} {name} {process:d} {thread:d} {message}',
-            'style': '{',
+def get_logging_config():
+    """Get logging configuration with file handler fallback"""
+    log_handlers = ['console']
+    
+    # Only add file handler if we can create the logs directory
+    file_handler_config = {}
+    try:
+        logs_dir = BASE_DIR / 'logs'
+        logs_dir.mkdir(exist_ok=True)
+        
+        # Test if we can write to the logs directory
+        test_file = logs_dir / 'test.log'
+        test_file.touch()
+        test_file.unlink()  # Remove test file
+        
+        file_handler_config = {
+            'file': {
+                'class': 'logging.FileHandler',
+                'filename': logs_dir / 'django.log',
+                'formatter': 'verbose',
+            }
+        }
+        if DEBUG:
+            log_handlers.append('file')
+            
+    except (OSError, PermissionError):
+        # File logging not available (e.g., in read-only file systems like Render)
+        pass
+    
+    return {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'verbose': {
+                'format': '[{levelname}] {asctime} {name} {process:d} {thread:d} {message}',
+                'style': '{',
+            },
+            'simple': {
+                'format': '[{levelname}] {message}',
+                'style': '{',
+            },
         },
-        'simple': {
-            'format': '[{levelname}] {message}',
-            'style': '{',
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'verbose' if DEBUG else 'simple',
+            },
+            **file_handler_config
         },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose' if DEBUG else 'simple',
-        },
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'logs' / 'django.log',
-            'formatter': 'verbose',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file'] if DEBUG else ['console'],
+        'root': {
+            'handlers': ['console'],
             'level': 'INFO',
-            'propagate': False,
         },
-        'tracker': {
-            'handlers': ['console', 'file'] if DEBUG else ['console'],
-            'level': 'DEBUG' if DEBUG else 'INFO',
-            'propagate': False,
+        'loggers': {
+            'django': {
+                'handlers': log_handlers,
+                'level': 'INFO',
+                'propagate': False,
+            },
+            'tracker': {
+                'handlers': log_handlers,
+                'level': 'DEBUG' if DEBUG else 'INFO',
+                'propagate': False,
+            },
         },
-    },
-}
+    }
+
+LOGGING = get_logging_config()
 
 # API Rate Limiting Settings
 API_RATE_LIMITS = {
@@ -294,4 +328,8 @@ LOGIN_REDIRECT_URL = '/'
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 
-
+# Try to create logs directory for development, ignore errors in production
+try:
+    (BASE_DIR / 'logs').mkdir(exist_ok=True)
+except (OSError, PermissionError):
+    pass  # Ignore in read-only file systems
