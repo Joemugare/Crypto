@@ -72,8 +72,8 @@ def adaptive_rate_limit_handler(max_retries: int = 3, base_delay: int = 60, back
                         result = func(*args, **kwargs)
                         cache.delete(rate_limit_key)
                         if result:
-                            cache.set(f"{func_name}_cache", result, timeout=86400)
-                            cache.set(f"{func_name}_cache_timestamp", time.time(), timeout=86400)
+                            cache.set(f"{func_name}_cache", result, timeout=7200)  # Cache for 2 hours
+                            cache.set(f"{func_name}_cache_timestamp", time.time(), timeout=7200)
                         return result
 
                     except requests.exceptions.HTTPError as e:
@@ -105,13 +105,13 @@ def _handle_http_error(e: requests.exceptions.HTTPError, func_name: str, attempt
         retry_after = int(e.response.headers.get('Retry-After', base_delay))
         reset_time = e.response.headers.get('X-RateLimit-Reset')
         wait_time = _calculate_wait_time(retry_after, reset_time, base_delay, backoff_multiplier, attempt)
-        logger.warning(f"Rate limit hit for {func_name}. Waiting {wait_time}s (attempt {attempt + 1}/{max_retries})")
+        logger.warning(f"Rate limit hit for {func_name}. Waiting {wait_time}s (attempt {attempt + 1}/{max_retries}), Headers: {e.response.headers}")
         cache.set(f"rate_limit:{func_name}", time.time() + wait_time, timeout=int(wait_time) + 60)
         return wait_time
-    elif e.response.status_code == 403:
-        logger.error(f"API key invalid or quota exceeded for {func_name}")
+    elif e.response.status_code in (401, 403):
+        logger.error(f"API key invalid or quota exceeded for {func_name}: {e.response.text}, Headers: {e.response.headers}")
     else:
-        logger.error(f"HTTP error {e.response.status_code} for {func_name}: {e}")
+        logger.error(f"HTTP error {e.response.status_code} for {func_name}: {e.response.text}, Headers: {e.response.headers}")
     return base_delay * (backoff_multiplier ** attempt)
 
 def _calculate_wait_time(retry_after: int, reset_time: Optional[str], base_delay: int,
@@ -137,24 +137,29 @@ def _get_cached_data(func_name: str) -> Optional[Dict]:
 def _get_fallback_data(func_name: str) -> Optional[Dict]:
     """Return fallback data when API calls fail"""
     if func_name == 'fetch_market_data':
-        logger.critical("USING EMERGENCY DEFAULT PRICES - NOT FOR TRADING")
-        return {
-            "bitcoin": {"usd":0.0,"usd_24h_change":0.0,"volume_24h":0.0,"market_cap":0.0,"symbol":"BTC","name":"Bitcoin","market_cap_rank":1,"last_updated":"EMERGENCY_DATA","sentiment":"ERROR - No Real Data"},
-            "ethereum": {"usd":0.0,"usd_24h_change":0.0,"volume_24h":0.0,"market_cap":0.0,"symbol":"ETH","name":"Ethereum","market_cap_rank":2,"last_updated":"EMERGENCY_DATA","sentiment":"ERROR - No Real Data"}
-        }
+        try:
+            with open('fallback_market_data.json', 'r') as f:
+                logger.info("Loaded fallback market data from file")
+                return json.load(f)
+        except FileNotFoundError:
+            logger.critical("USING EMERGENCY DEFAULT PRICES - NOT FOR TRADING")
+            return {
+                "bitcoin": {"usd": 60000, "usd_24h_change": 0.0, "volume_24h": 0.0, "market_cap": 0.0, "symbol": "BTC", "name": "Bitcoin", "market_cap_rank": 1, "last_updated": "FALLBACK", "sentiment": "Neutral"},
+                "ethereum": {"usd": 2500, "usd_24h_change": 0.0, "volume_24h": 0.0, "market_cap": 0.0, "symbol": "ETH", "name": "Ethereum", "market_cap_rank": 2, "last_updated": "FALLBACK", "sentiment": "Neutral"}
+            }
     elif func_name == 'fetch_news':
         return []
     elif func_name == 'fetch_sentiment':
-        return {"score":0.5,"label":"Neutral"}
+        return {"score": 0.5, "label": "Neutral"}
     elif func_name == 'fetch_valid_coins':
-        return ['bitcoin','ethereum','binancecoin','cardano','solana']
+        return ['bitcoin', 'ethereum', 'binancecoin', 'cardano', 'solana']
     return None
 
 # ------------------ Market Data ------------------
 
-@adaptive_rate_limit_handler(max_retries=3, base_delay=45)
+@adaptive_rate_limit_handler(max_retries=3, base_delay=60)
 def fetch_market_data(diagnostic_mode: bool=False, min_coins: int=30) -> Optional[Dict]:
-    """Fetch real-time market data from CoinGecko Pro API"""
+    """Fetch real-time market data from CoinGecko Demo API"""
     cached_data = cache.get('market_data')
     cache_age = cache.get('market_data_timestamp')
     if cached_data and cache_age and (time.time()-cache_age)<300 and len(cached_data)>=min_coins:
@@ -166,80 +171,97 @@ def fetch_market_data(diagnostic_mode: bool=False, min_coins: int=30) -> Optiona
     max_pages = 3
     try:
         while len(market_data) < min_coins and page <= max_pages:
-            url = "https://pro-api.coingecko.com/api/v3/coins/markets" if COINGECKO_API_KEY else "https://api.coingecko.com/api/v3/coins/markets"
-            headers = {'x-cg-pro-api-key': COINGECKO_API_KEY} if COINGECKO_API_KEY else {}
+            url = "https://api.coingecko.com/api/v3/coins/markets"  # Demo API endpoint
+            headers = {'x-cg-demo-api-key': COINGECKO_API_KEY} if COINGECKO_API_KEY else {}
             params = {
-                'vs_currency':'usd','order':'market_cap_desc','per_page':50,'page':page,'sparkline':'false','price_change_percentage':'1h,24h,7d'
+                'vs_currency': 'usd',
+                'order': 'market_cap_desc',
+                'per_page': 50,
+                'page': page,
+                'sparkline': 'false',
+                'price_change_percentage': '1h,24h,7d'
             }
-            logger.info(f"Fetching market data page {page}")
+            logger.info(f"Fetching market data page {page}, URL: {url}, Headers: {headers}")
             response = requests.get(url, headers=headers, params=params, timeout=30)
+            logger.info(f"Status: {response.status_code}, Headers: {response.headers}")
             response.raise_for_status()
             data = response.json()
 
             skipped = []
             for coin in data:
                 if 'id' not in coin or coin.get('current_price') is None:
-                    skipped.append(coin.get('id','unknown'))
+                    skipped.append(coin.get('id', 'unknown'))
                     continue
                 market_data[coin['id']] = {
                     "usd": float(coin['current_price']),
-                    "usd_24h_change": float(coin.get('price_change_percentage_24h',0)),
-                    "volume_24h": float(coin.get('total_volume',0)),
-                    "market_cap": float(coin.get('market_cap',0)),
-                    "market_cap_rank": coin.get('market_cap_rank',0),
-                    "symbol": coin.get('symbol','').upper(),
-                    "name": coin.get('name',''),
-                    "last_updated": coin.get('last_updated',''),
+                    "usd_24h_change": float(coin.get('price_change_percentage_24h', 0)),
+                    "volume_24h": float(coin.get('total_volume', 0)),
+                    "market_cap": float(coin.get('market_cap', 0)),
+                    "market_cap_rank": coin.get('market_cap_rank', 0),
+                    "symbol": coin.get('symbol', '').upper(),
+                    "name": coin.get('name', ''),
+                    "last_updated": coin.get('last_updated', ''),
                     "sentiment": "Neutral"
                 }
             page += 1
             time.sleep(1)
 
-        cache.set('market_data', market_data, timeout=3600)
-        cache.set('market_data_timestamp', time.time(), timeout=3600)
+        # Save successful data to fallback file
+        if market_data:
+            try:
+                with open('fallback_market_data.json', 'w') as f:
+                    json.dump(market_data, f)
+                logger.info("Saved market data to fallback file")
+            except Exception as e:
+                logger.error(f"Failed to save fallback data: {e}")
+
+        cache.set('market_data', market_data, timeout=7200)  # Cache for 2 hours
+        cache.set('market_data_timestamp', time.time(), timeout=7200)
         return market_data
     except Exception as e:
-        logger.error(f"Error fetching market data: {e}", exc_info=True)
+        logger.error(f"Error fetching market data: {e}, Response: {getattr(e.response, 'text', '')}, Headers: {getattr(e.response, 'headers', '')}", exc_info=True)
         return cached_data if cached_data else _get_fallback_data('fetch_market_data')
 
 # ------------------ Valid Coins ------------------
 
 @adaptive_rate_limit_handler(max_retries=2, base_delay=10)
 def fetch_valid_coins() -> List[str]:
-    """Fetch valid cryptocurrency IDs from CoinGecko"""
+    """Fetch valid cryptocurrency IDs from CoinGecko Demo API"""
     if valid_coins := cache.get('valid_coins'):
         return valid_coins
     try:
-        url = "https://pro-api.coingecko.com/api/v3/coins/list" if COINGECKO_API_KEY else "https://api.coingecko.com/api/v3/coins/list"
-        headers = {'x-cg-pro-api-key': COINGECKO_API_KEY} if COINGECKO_API_KEY else {}
+        url = "https://api.coingecko.com/api/v3/coins/list"  # Demo API endpoint
+        headers = {'x-cg-demo-api-key': COINGECKO_API_KEY} if COINGECKO_API_KEY else {}
+        logger.info(f"Fetching valid coins, URL: {url}, Headers: {headers}")
         response = requests.get(url, headers=headers, timeout=30)
+        logger.info(f"Status: {response.status_code}, Headers: {response.headers}")
         response.raise_for_status()
         valid_coins = [coin['id'].lower() for coin in response.json() if 'id' in coin]
         cache.set('valid_coins', valid_coins, timeout=86400)
         return valid_coins
     except Exception as e:
-        logger.error(f"Error fetching valid coins: {e}", exc_info=True)
-        return ['bitcoin','ethereum','binancecoin','cardano','solana']
+        logger.error(f"Error fetching valid coins: {e}, Response: {getattr(e.response, 'text', '')}, Headers: {getattr(e.response, 'headers', '')}", exc_info=True)
+        return ['bitcoin', 'ethereum', 'binancecoin', 'cardano', 'solana']
 
 # ------------------ News & Sentiment ------------------
 
-def analyze_article_sentiment(text: str) -> Dict[str, Union[float,str]]:
-    if not VADER_AVAILABLE or not text or len(text.strip())<10:
-        return {"score":0.5,"label":"Neutral"}
+def analyze_article_sentiment(text: str) -> Dict[str, Union[float, str]]:
+    if not VADER_AVAILABLE or not text or len(text.strip()) < 10:
+        return {"score": 0.5, "label": "Neutral"}
     try:
         analyzer = SentimentIntensityAnalyzer()
-        score = (analyzer.polarity_scores(text)['compound']+1)/2
-        label = ("Very Positive" if score>0.65 else "Positive" if score>0.55 else "Neutral" if score>0.45 else "Negative" if score>0.35 else "Very Negative")
-        return {"score":round(score,3),"label":label}
+        score = (analyzer.polarity_scores(text)['compound'] + 1) / 2
+        label = ("Very Positive" if score > 0.65 else "Positive" if score > 0.55 else "Neutral" if score > 0.45 else "Negative" if score > 0.35 else "Very Negative")
+        return {"score": round(score, 3), "label": label}
     except Exception as e:
         logger.error(f"Error analyzing sentiment: {e}", exc_info=True)
-        return {"score":0.5,"label":"Neutral"}
+        return {"score": 0.5, "label": "Neutral"}
 
 @adaptive_rate_limit_handler(max_retries=2, base_delay=10)
 def fetch_news() -> List[Dict]:
     """Fetch cryptocurrency news from NewsAPI"""
     cached_news = cache.get('crypto_news')
-    if cached_news and cache.get('crypto_news_timestamp') and (time.time()-cache.get('crypto_news_timestamp'))<1800:
+    if cached_news and cache.get('crypto_news_timestamp') and (time.time() - cache.get('crypto_news_timestamp')) < 7200:
         return cached_news
     if not NEWSAPI_KEY:
         logger.warning("NewsAPI key not configured")
@@ -252,11 +274,12 @@ def fetch_news() -> List[Dict]:
                 'apiKey': NEWSAPI_KEY,
                 'language': 'en',
                 'sortBy': 'publishedAt',
-                'pageSize': 20,
+                'pageSize': 10,  # Reduced to avoid rate limits
                 'from': (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
             },
             timeout=30
         )
+        logger.info(f"NewsAPI Status: {response.status_code}, Headers: {response.headers}")
         response.raise_for_status()
         articles = response.json().get('articles', [])
         
@@ -271,29 +294,24 @@ def fetch_news() -> List[Dict]:
                 'sentiment': sentiment
             })
         
-        cache.set('crypto_news', processed_articles, timeout=1800)
-        cache.set('crypto_news_timestamp', time.time(), timeout=1800)
+        cache.set('crypto_news', processed_articles, timeout=7200)  # Cache for 2 hours
+        cache.set('crypto_news_timestamp', time.time(), timeout=7200)
         return processed_articles
     except Exception as e:
-        logger.error(f"Error fetching news: {e}", exc_info=True)
+        logger.error(f"Error fetching news: {e}, Response: {getattr(e.response, 'text', '')}, Headers: {getattr(e.response, 'headers', '')}", exc_info=True)
         return cached_news if cached_news else _get_fallback_data('fetch_news')
 
-# Add the missing fetch_sentiment function
 @adaptive_rate_limit_handler(max_retries=2, base_delay=10)
 def fetch_sentiment() -> Dict[str, Union[float, str]]:
-    """
-    Fetch overall market sentiment by analyzing recent news articles
-    """
+    """Fetch overall market sentiment by analyzing recent news articles"""
     try:
         articles = fetch_news()
         if not articles:
             return _get_fallback_data('fetch_sentiment')
         
-        # Calculate average sentiment from all articles
         total_score = sum(article['sentiment']['score'] for article in articles)
         avg_score = total_score / len(articles)
         
-        # Convert to label
         label = ("Very Positive" if avg_score > 0.65 else 
                  "Positive" if avg_score > 0.55 else 
                  "Neutral" if avg_score > 0.45 else 
