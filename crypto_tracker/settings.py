@@ -311,3 +311,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL = '/dashboard/'
+
+SENTIMENT_API_URL = env('SENTIMENT_API_URL', default='https://api.sentiment.io/v1/crypto-sentiment')
