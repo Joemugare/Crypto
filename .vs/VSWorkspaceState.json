@@ -2,9 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\tracker",
-    "\\tracker\\templates",
     "\\tracker\\templates\\registration"
   ],
-  "SelectedNode": "\\tracker\\models.py",
+  "SelectedNode": "\\.gitignore",
   "PreviewInSolutionExplorer": false
 }

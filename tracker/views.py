@@ -1,3 +1,4 @@
+# tracker/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login, logout
@@ -7,8 +8,12 @@ from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.core.cache import cache
 from decimal import Decimal
+import requests
+import logging
 from .models import Portfolio, Watchlist, Alert, CryptoPrice
-from .utils import fetch_market_data, fetch_news, fetch_sentiment
+from .utils import fetch_market_data, fetch_valid_coins, fetch_news, fetch_sentiment
+
+logger = logging.getLogger(__name__)
 
 def home(request):
     try:
@@ -24,6 +29,7 @@ def home(request):
             }
         cache.set('market_data', formatted_data, timeout=300)
     except Exception as e:
+        logger.error(f"Error in home view: {e}")
         formatted_data = {}
         messages.error(request, "Failed to fetch market data. Please try again later.")
     return render(request, "home.html", {
@@ -76,6 +82,20 @@ def portfolio(request):
     price_map = {coin: Decimal(str(data["usd"])) for coin, data in market_data.items()}
 
     portfolio_qs = Portfolio.objects.filter(user=request.user)
+    # Fetch prices for coins not in market_data
+    for p in portfolio_qs:
+        if p.cryptocurrency not in price_map:
+            try:
+                response = requests.get(
+                    f"https://api.coingecko.com/api/v3/coins/{p.cryptocurrency}/market_chart?vs_currency=usd&days=1"
+                )
+                response.raise_for_status()
+                data = response.json()
+                price_map[p.cryptocurrency] = Decimal(str(data['prices'][-1][1]))
+            except requests.RequestException as e:
+                logger.error(f"Error fetching price for {p.cryptocurrency}: {e}")
+                price_map[p.cryptocurrency] = Decimal('0.0')
+
     portfolio_data = [{
         "cryptocurrency": p.cryptocurrency,
         "amount": p.amount,
@@ -85,7 +105,10 @@ def portfolio(request):
                        (p.purchase_price * p.amount)
     } for p in portfolio_qs]
 
-    return render(request, "portfolio.html", {"portfolio": portfolio_data})
+    return render(request, "portfolio.html", {
+        "portfolio": portfolio_data,
+        "edit_item": None
+    })
 
 @login_required
 def add_to_portfolio(request):
@@ -101,7 +124,9 @@ def add_to_portfolio(request):
             purchase_price = Decimal(purchase_price)
             if amount <= 0 or purchase_price <= 0:
                 raise ValidationError("Amount and purchase price must be positive.")
-            if cryptocurrency.lower() not in (fetch_market_data() or {}):
+            valid_coins = fetch_valid_coins()
+            if cryptocurrency.lower() not in valid_coins:
+                logger.info(f"Invalid cryptocurrency: {cryptocurrency.lower()} not in {valid_coins[:10]}...")
                 raise ValidationError("Invalid cryptocurrency.")
         except (ValidationError, ValueError) as e:
             messages.error(request, str(e))
@@ -192,7 +217,9 @@ def add_to_watchlist(request):
         try:
             if not cryptocurrency:
                 raise ValidationError("Cryptocurrency is required.")
-            if cryptocurrency.lower() not in (fetch_market_data() or {}):
+            valid_coins = fetch_valid_coins()
+            if cryptocurrency.lower() not in valid_coins:
+                logger.info(f"Invalid cryptocurrency for watchlist: {cryptocurrency.lower()}")
                 raise ValidationError("Invalid cryptocurrency.")
         except ValidationError as e:
             messages.error(request, str(e))
@@ -225,7 +252,9 @@ def add_alert(request):
             target_price = Decimal(target_price)
             if target_price <= 0:
                 raise ValidationError("Target price must be positive.")
-            if cryptocurrency.lower() not in (fetch_market_data() or {}):
+            valid_coins = fetch_valid_coins()
+            if cryptocurrency.lower() not in valid_coins:
+                logger.info(f"Invalid cryptocurrency for alert: {cryptocurrency.lower()}")
                 raise ValidationError("Invalid cryptocurrency.")
             if condition not in ["above", "below"]:
                 raise ValidationError("Invalid condition.")
@@ -321,13 +350,22 @@ def live_charts(request):
 def market_data_api(request):
     try:
         market_data = cache.get('market_data') or fetch_market_data() or {}
+        query = request.GET.get('search', '').lower()
+        if query:
+            valid_coins = fetch_valid_coins()
+            filtered_coins = [coin for coin in valid_coins if query in coin]
+            market_data = {
+                coin: market_data.get(coin, {"usd": 0.0, "usd_24h_change": 0.0, "volume_24h": 0.0, "sentiment": "Neutral"})
+                for coin in filtered_coins[:50]
+            }
         cache.set('market_data', market_data, timeout=300)
         sentiment_data = fetch_sentiment() or {"score": 0.5, "label": "Neutral"}
         response = {
             "market_data": market_data,
             "sentiment": sentiment_data
         }
-    except Exception:
+    except Exception as e:
+        logger.error(f"Error in market_data_api: {e}")
         response = {"market_data": {}, "sentiment": {"score": 0.5, "label": "Neutral"}}
     return JsonResponse(response)
 
@@ -344,3 +382,7 @@ def alerts_api(request):
         return JsonResponse({"alerts": alerts_data})
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+def clear_cache(request):
+    cache.clear()
+    return JsonResponse({"status": "Cache cleared"})
