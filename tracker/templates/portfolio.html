@@ -4,17 +4,17 @@
 
 {% block content %}
 <style>
+    /* Existing styles unchanged */
     :root {
         background: #1a1a1a;
         color: #ffffff;
+        --portfolio-primary: #667eea;
+        --portfolio-success: #00d4aa;
+        --portfolio-danger: #ff6b6b;
+        --portfolio-warning: #feca57;
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --card-border-radius: 16px;
     }
-    --portfolio-primary: #667eea;
-    --portfolio-success: #00d4aa;
-    --portfolio-danger: #ff6b6b;
-    --portfolio-warning: #feca57;
-    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    --card-border-radius: 16px;
-
     .stats-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border-radius: var(--card-border-radius);
@@ -25,12 +25,10 @@
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         box-shadow: var(--card-shadow);
     }
-
     .stats-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
     }
-
     .stats-card::before {
         content: '';
         position: absolute;
@@ -42,27 +40,21 @@
         transform: translateX(-100%);
         transition: transform 0.5s ease;
     }
-
     .stats-card:hover::before {
         transform: translateX(100%);
     }
-
     .stats-card.total-value {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
-
     .stats-card.total-profit-loss {
         background: linear-gradient(135deg, #00d4aa 0%, #00a085 100%);
     }
-
     .stats-card.best-performer {
         background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%);
     }
-
     .stats-card.asset-count {
         background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
     }
-
     .stats-icon {
         position: absolute;
         top: 1rem;
@@ -70,31 +62,26 @@
         font-size: 2rem;
         opacity: 0.3;
     }
-
     .stats-content {
         position: relative;
         z-index: 1;
     }
-
     .stats-number {
         font-size: 1.8rem;
         font-weight: 700;
         margin: 0;
         line-height: 1.2;
     }
-
     .stats-label {
         margin: 0;
         opacity: 0.9;
         font-size: 0.9rem;
     }
-
     .stats-trend {
         font-size: 0.8rem;
         margin-top: 0.5rem;
         opacity: 0.8;
     }
-
     .enhanced-card {
         background: white;
         border-radius: var(--card-border-radius);
@@ -102,17 +89,14 @@
         border: none;
         overflow: hidden;
     }
-
     .enhanced-card .card-header {
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         border-bottom: 1px solid #dee2e6;
         padding: 1rem 1.5rem;
     }
-
     .portfolio-table {
         font-size: 0.95rem;
     }
-
     .portfolio-table th {
         background: #f8f9fa;
         border-top: none;
@@ -122,68 +106,54 @@
         top: 0;
         z-index: 10;
     }
-
     .portfolio-table th.sortable {
         cursor: pointer;
         user-select: none;
         transition: background-color 0.2s ease;
     }
-
     .portfolio-table th.sortable:hover {
         background-color: #e9ecef;
     }
-
     .portfolio-table th.sortable.sorted-asc .fa-sort::before {
         content: "\f0de";
     }
-
     .portfolio-table th.sortable.sorted-desc .fa-sort::before {
         content: "\f0dd";
     }
-
     .portfolio-row {
         transition: all 0.3s ease;
         cursor: pointer;
     }
-
     .portfolio-row:hover {
         background-color: rgba(102, 126, 234, 0.05) !important;
         transform: translateX(3px);
     }
-
     .asset-cell {
         padding: 1rem 0.75rem;
     }
-
     .crypto-icon img {
         width: 32px;
         height: 32px;
     }
-
     .price-cell {
         position: relative;
     }
-
     .price-change-up {
         animation: priceUp 0.6s ease-out;
     }
-
     .price-change-down {
         animation: priceDown 0.6s ease-out;
     }
-
     @keyframes priceUp {
         0% { background-color: transparent; }
         50% { background-color: rgba(0, 212, 170, 0.2); }
         100% { background-color: transparent; }
     }
-
     @keyframes priceDown {
         0% { background-color: transparent; }
         50% { background-color: rgba(255, 107, 107, 0.2); }
         100% { background-color: transparent; }
     }
-
     .portfolio-card {
         background: white;
         border-radius: 12px;
@@ -192,65 +162,52 @@
         transition: all 0.3s ease;
         border: 1px solid #e9ecef;
     }
-
     .portfolio-card:hover {
         transform: translateY(-3px);
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
     }
-
     .view-content.d-none {
         display: none !important;
     }
-
     .loading-skeleton {
         background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
         background-size: 200% 100%;
         animation: skeleton 1.5s infinite;
         border-radius: 4px;
     }
-
     @keyframes skeleton {
         0% { background-position: 200% 0; }
         100% { background-position: -200% 0; }
     }
-
     .empty-state {
         padding: 3rem 1rem;
     }
-
     .empty-icon {
         opacity: 0.3;
     }
-
     .modal-content {
         border-radius: var(--card-border-radius);
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
     }
-
     .form-control:focus {
         border-color: var(--portfolio-primary);
         box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
     }
-
     @media (max-width: 768px) {
         .stats-card {
             margin-bottom: 1rem;
         }
-        
         .portfolio-table {
             font-size: 0.85rem;
         }
-        
         .crypto-icon img {
             width: 24px;
             height: 24px;
         }
-        
         .table-responsive {
             border-radius: 8px;
         }
     }
-
     @media (prefers-color-scheme: dark) {
         .enhanced-card {
             background: #1a1a1a;
@@ -358,7 +315,6 @@
                             <label class="btn btn-outline-secondary" for="tableView">
                                 <i class="fas fa-table"></i>
                             </label>
-                            
                             <input type="radio" class="btn-check" name="viewMode" id="cardView" autocomplete="off">
                             <label class="btn btn-outline-secondary" for="cardView">
                                 <i class="fas fa-th-large"></i>
@@ -596,9 +552,10 @@
                     <div class="mb-3">
                         <label for="cryptocurrency" class="form-label">Cryptocurrency</label>
                         <input type="text" class="form-control" name="cryptocurrency" id="cryptocurrency" 
-                               placeholder="e.g., bitcoin, ethereum" required autocomplete="off"
+                               placeholder="e.g., bitcoin, ethereum, litecoin" required autocomplete="off"
                                value="{% if edit_item %}{{ edit_item.cryptocurrency }}{% endif %}"
-                               {% if edit_item %}disabled{% endif %}>
+                               {% if edit_item %}disabled{% endif %} list="crypto-suggestions">
+                        <datalist id="crypto-suggestions"></datalist>
                         <div class="invalid-feedback">Please enter a valid cryptocurrency name.</div>
                         <small class="form-text text-muted">Start typing to see suggestions</small>
                     </div>
@@ -661,7 +618,7 @@
 
 <script>
 function editAsset(cryptocurrency, amount, purchase_price) {
-    console.log('Edit clicked:', cryptocurrency, amount, purchase_price); // Debug log
+    console.log('Edit clicked:', cryptocurrency, amount, purchase_price);
     const modal = document.getElementById('addAssetModal');
     const modalTitle = document.getElementById('addAssetModalLabel');
     const form = document.getElementById('assetForm');
@@ -688,7 +645,7 @@ function editAsset(cryptocurrency, amount, purchase_price) {
 }
 
 function removeAsset(cryptocurrency) {
-    console.log('Remove clicked:', cryptocurrency); // Debug log
+    console.log('Remove clicked:', cryptocurrency);
     const confirmModal = document.getElementById('confirmModal');
     const confirmMessage = document.getElementById('confirmMessage');
     const confirmBtn = document.getElementById('confirmBtn');
@@ -718,7 +675,7 @@ function getCurrentPrice() {
         alert('Please enter a cryptocurrency first.');
         return;
     }
-    fetch('/api/market-data/')
+    fetch(`/api/market-data/?search=${cryptoInput}`)
         .then(response => response.json())
         .then(data => {
             const price = data.market_data[cryptoInput]?.usd;
@@ -727,7 +684,23 @@ function getCurrentPrice() {
                 document.getElementById('priceAlert').classList.remove('d-none');
                 document.getElementById('priceAlertText').innerText = `Current price for ${cryptoInput} is $${price}`;
             } else {
-                alert('Could not fetch current price for ' + cryptoInput);
+                // Try fetching individual coin price
+                fetch(`https://api.coingecko.com/api/v3/coins/${cryptoInput}/market_chart?vs_currency=usd&days=1`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const price = data.prices[data.prices.length - 1][1];
+                        if (price) {
+                            document.getElementById('purchase_price').value = price;
+                            document.getElementById('priceAlert').classList.remove('d-none');
+                            document.getElementById('priceAlertText').innerText = `Current price for ${cryptoInput} is $${price}`;
+                        } else {
+                            alert('Could not fetch current price for ' + cryptoInput);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching individual price:', error);
+                        alert('Could not fetch current price for ' + cryptoInput);
+                    });
             }
         })
         .catch(error => {
@@ -736,7 +709,31 @@ function getCurrentPrice() {
         });
 }
 
-// Optional: Toggle between table and card view
+// Autocomplete for cryptocurrency input
+const cryptoInput = document.getElementById('cryptocurrency');
+cryptoInput.addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    if (query.length < 2) return;
+    fetch(`/api/market-data/?search=${query}`)
+        .then(response => response.json())
+        .then(data => {
+            const suggestions = Object.keys(data.market_data).slice(0, 10);
+            const datalist = document.createElement('datalist');
+            datalist.id = 'crypto-suggestions';
+            suggestions.forEach(coin => {
+                const option = document.createElement('option');
+                option.value = coin;
+                datalist.appendChild(option);
+            });
+            const existingDatalist = document.getElementById('crypto-suggestions');
+            if (existingDatalist) existingDatalist.remove();
+            cryptoInput.setAttribute('list', 'crypto-suggestions');
+            document.body.appendChild(datalist);
+        })
+        .catch(error => console.error('Error fetching suggestions:', error));
+});
+
+// Toggle between table and card view
 document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
     radio.addEventListener('change', function() {
         document.getElementById('tableViewContent').classList.toggle('d-none', this.id !== 'tableView');
@@ -746,11 +743,11 @@ document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
 
 // Placeholder for exportPortfolio and refreshPortfolio
 function exportPortfolio() {
-    console.log('Export portfolio clicked'); // Implement export logic
+    console.log('Export portfolio clicked');
 }
 
 function refreshPortfolio() {
-    console.log('Refresh portfolio clicked'); // Implement refresh logic
+    console.log('Refresh portfolio clicked');
 }
 </script>
 {% endblock %}
