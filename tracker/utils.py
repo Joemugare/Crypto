@@ -48,12 +48,16 @@ def fetch_market_data():
     
     try:
         # Add timeout to prevent worker timeouts
-        response = requests.get(
-            "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false",
-            timeout=30  # 30 second timeout
-        )
+        url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false"
+        response = requests.get(url, timeout=30)
+        logger.debug(f"CoinGecko API response status: {response.status_code}")
         response.raise_for_status()
         data = response.json()
+        logger.debug(f"CoinGecko API response data: {data}")
+        
+        if not isinstance(data, list):
+            logger.error(f"CoinGecko API returned unexpected data format: {type(data)}")
+            return {}
         
         market_data = {
             coin['id']: {
@@ -61,19 +65,22 @@ def fetch_market_data():
                 "usd_24h_change": coin['price_change_percentage_24h'],
                 "volume_24h": coin['total_volume'],
                 "sentiment": "Neutral"  # Placeholder
-            } for coin in data
+            } for coin in data if 'id' in coin and 'current_price' in coin
         }
         
         # Cache for 5 minutes
         cache.set('market_data', market_data, timeout=300)
-        logger.info(f"Fetched and cached {len(data)} coins for market data")
+        logger.info(f"Fetched and cached {len(market_data)} coins for market data")
         return market_data
         
     except requests.Timeout:
-        logger.error("Timeout while fetching market data")
+        logger.error("Timeout while fetching market data from CoinGecko")
         return {}
     except requests.RequestException as e:
-        logger.error(f"Error fetching market data: {e}")
+        logger.error(f"Error fetching market data from CoinGecko: {e}")
+        return {}
+    except ValueError as e:
+        logger.error(f"Error parsing CoinGecko response: {e}")
         return {}
 
 def fetch_valid_coins():
