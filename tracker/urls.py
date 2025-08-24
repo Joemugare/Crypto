@@ -28,4 +28,6 @@ urlpatterns = [
     path('live-charts/', views.live_charts, name='live_charts'),
     path('api/market-data/', views.market_data_api, name='market_data_api'),
     path('clear-cache/', views.clear_cache, name='clear_cache'),
+
 ]
+
