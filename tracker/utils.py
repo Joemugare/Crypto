@@ -24,11 +24,21 @@ def rate_limit_handler(max_retries=5, base_delay=60):
                             continue
                         else:
                             logger.error(f"Max retries ({max_retries}) exceeded for {func.__name__}. Rate limit still active.")
+                            # Return stale cache data if available
+                            cached_data = cache.get(f"{func.__name__}_cache")
+                            if cached_data is not None:
+                                logger.info(f"Returning stale cache data for {func.__name__} due to rate limit")
+                                return cached_data
                             return None
                     else:
                         raise e
                 except Exception as e:
                     logger.error(f"Error in {func.__name__}: {e}")
+                    # Return stale cache data if available
+                    cached_data = cache.get(f"{func.__name__}_cache")
+                    if cached_data is not None:
+                        logger.info(f"Returning stale cache data for {func.__name__} due to error")
+                        return cached_data
                     return None
             return None
         return wrapper
@@ -38,7 +48,7 @@ def rate_limit_handler(max_retries=5, base_delay=60):
 def fetch_market_data():
     """
     Fetch market data with caching and rate limit handling.
-    Cache results for 10 minutes to reduce API calls.
+    Cache results for 30 minutes to reduce API calls.
     """
     # Check cache first
     cached_data = cache.get('market_data')
@@ -46,8 +56,15 @@ def fetch_market_data():
         logger.info(f"Retrieved market data from cache ({len(cached_data)} coins)")
         return cached_data
     
+    # Check last API call time to avoid rate limits
+    last_call = cache.get('market_data_last_call')
+    if last_call and (time.time() - last_call) < 60:  # Wait 60s between calls
+        logger.warning("Skipping CoinGecko API call due to recent request")
+        return cached_data if cached_data is not None else {}
+    
     try:
         url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false"
+        logger.debug(f"Calling CoinGecko API: {url}")
         response = requests.get(url, timeout=30)
         logger.debug(f"CoinGecko API response status: {response.status_code}")
         response.raise_for_status()
@@ -67,8 +84,10 @@ def fetch_market_data():
             } for coin in data if 'id' in coin and 'current_price' in coin
         }
         
-        # Cache for 10 minutes (increased from 5 to reduce API calls)
-        cache.set('market_data', market_data, timeout=600)
+        # Cache for 30 minutes
+        cache.set('market_data', market_data, timeout=1800)
+        cache.set('market_data_last_call', time.time(), timeout=1800)
+        cache.set('fetch_market_data_cache', market_data, timeout=86400)  # Stale cache for 24 hours
         logger.info(f"Fetched and cached {len(market_data)} coins for market data")
         return market_data
         
