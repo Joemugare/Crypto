@@ -1,53 +1,86 @@
 # tracker/utils.py
 import requests
 import logging
+import time
 from django.core.cache import cache
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
 def fetch_market_data():
-    try:
-        response = requests.get(
-            "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false"
-        )
-        response.raise_for_status()
-        data = response.json()
-        logger.info(f"Fetched {len(data)} coins for market data: {[coin['id'] for coin in data]}")
-        return {
-            coin['id']: {
-                "usd": coin['current_price'],
-                "usd_24h_change": coin['price_change_percentage_24h'],
-                "volume_24h": coin['total_volume'],
-                "sentiment": "Neutral"  # Placeholder
-            } for coin in data
-        }
-    except requests.RequestException as e:
-        logger.error(f"Error fetching market data: {e}")
-        return {}
+    """
+    Fetch market data for top 50 coins with rate limit handling.
+    Cache for 1 hour to reduce API calls.
+    """
+    market_data = cache.get('market_data')
+    if market_data is not None:
+        logger.info(f"Retrieved market data from cache for {len(market_data)} coins")
+        return market_data
+    for attempt in range(3):  # Retry up to 3 times
+        try:
+            response = requests.get(
+                "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false"
+            )
+            response.raise_for_status()
+            data = response.json()
+            market_data = {
+                coin['id']: {
+                    "usd": coin['current_price'],
+                    "usd_24h_change": coin['price_change_percentage_24h'],
+                    "volume_24h": coin['total_volume'],
+                    "sentiment": "Neutral"
+                } for coin in data
+            }
+            cache.set('market_data', market_data, timeout=3600)  # Cache for 1 hour
+            logger.info(f"Fetched {len(market_data)} coins for market data: {list(market_data.keys())}")
+            return market_data
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 429:
+                wait_time = 2 ** attempt * 10  # Exponential backoff: 10s, 20s, 40s
+                logger.warning(f"Rate limit hit for market data. Retrying in {wait_time}s...")
+                time.sleep(wait_time)
+            else:
+                logger.error(f"Error fetching market data: {e}")
+                return {}
+        except requests.RequestException as e:
+            logger.error(f"Error fetching market data: {e}")
+            return {}
+    logger.error("Failed to fetch market data after retries")
+    return {}  # Fallback to empty dict
 
 def fetch_valid_coins():
     """
-    Fetch the list of all valid cryptocurrency IDs from CoinGecko.
-    Cache the result for 24 hours to avoid rate limits.
+    Fetch all valid cryptocurrency IDs from CoinGecko.
+    Cache for 24 hours to avoid rate limits.
     """
     valid_coins = cache.get('valid_coins')
     if valid_coins is not None:
         logger.info(f"Retrieved {len(valid_coins)} valid coins from cache")
         return valid_coins
-    try:
-        response = requests.get(
-            "https://api.coingecko.com/api/v3/coins/list"
-        )
-        response.raise_for_status()
-        data = response.json()
-        valid_coins = [coin['id'].lower() for coin in data]
-        cache.set('valid_coins', valid_coins, timeout=86400)  # Cache for 24 hours
-        logger.info(f"Fetched {len(valid_coins)} valid coins from CoinGecko")
-        return valid_coins
-    except requests.RequestException as e:
-        logger.error(f"Error fetching valid coins: {e}")
-        return []
+    for attempt in range(3):
+        try:
+            response = requests.get(
+                "https://api.coingecko.com/api/v3/coins/list"
+            )
+            response.raise_for_status()
+            data = response.json()
+            valid_coins = [coin['id'].lower() for coin in data]
+            cache.set('valid_coins', valid_coins, timeout=86400)  # Cache for 24 hours
+            logger.info(f"Fetched {len(valid_coins)} valid coins from CoinGecko")
+            return valid_coins
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 429:
+                wait_time = 2 ** attempt * 10
+                logger.warning(f"Rate limit hit for valid coins. Retrying in {wait_time}s...")
+                time.sleep(wait_time)
+            else:
+                logger.error(f"Error fetching valid coins: {e}")
+                return []
+        except requests.RequestException as e:
+            logger.error(f"Error fetching valid coins: {e}")
+            return []
+    logger.error("Failed to fetch valid coins after retries")
+    return []  # Fallback to empty list
 
 def fetch_news():
     try:
