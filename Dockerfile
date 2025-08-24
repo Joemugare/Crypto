@@ -22,12 +22,17 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project files
 COPY . .
 
-# Collect static files
+# Set Django settings and SECRET_KEY
 ENV DJANGO_SETTINGS_MODULE=crypto_tracker.settings
+# Replace with your actual secret key or use Render secrets
+ENV SECRET_KEY="replace-this-with-a-secure-key"
+
+# Collect static files
 RUN python manage.py collectstatic --noinput
 
 # Expose port (Render uses PORT environment variable)
+ENV PORT 8000
 EXPOSE $PORT
 
 # Run gunicorn with dynamic port
-CMD ["gunicorn", "crypto_tracker.wsgi:application", "--bind", "0.0.0.0:$PORT", "--workers", "1"]
+CMD ["sh", "-c", "gunicorn crypto_tracker.wsgi:application --bind 0.0.0.0:$PORT --workers 1"]
