@@ -407,6 +407,7 @@ def alerts_api(request):
 
 def clear_cache(request):
     cache.clear()
+
     messages.success(request, "Cache cleared successfully!")
     return redirect("home")
 
@@ -454,3 +455,4 @@ class ReadinessCheckView(View):
                     'cache': 'error'
                 }
             }, status=503)
+
