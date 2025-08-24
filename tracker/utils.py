@@ -1,7 +1,10 @@
 # tracker/utils.py
 import requests
+import logging
 from django.core.cache import cache
-from datetime import datetime, timedelta
+from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 def fetch_market_data():
     try:
@@ -10,6 +13,7 @@ def fetch_market_data():
         )
         response.raise_for_status()
         data = response.json()
+        logger.info(f"Fetched {len(data)} coins for market data: {[coin['id'] for coin in data]}")
         return {
             coin['id']: {
                 "usd": coin['current_price'],
@@ -18,13 +22,36 @@ def fetch_market_data():
                 "sentiment": "Neutral"  # Placeholder
             } for coin in data
         }
-    except requests.RequestException:
+    except requests.RequestException as e:
+        logger.error(f"Error fetching market data: {e}")
         return {}
+
+def fetch_valid_coins():
+    """
+    Fetch the list of all valid cryptocurrency IDs from CoinGecko.
+    Cache the result for 24 hours to avoid rate limits.
+    """
+    valid_coins = cache.get('valid_coins')
+    if valid_coins is not None:
+        logger.info(f"Retrieved {len(valid_coins)} valid coins from cache")
+        return valid_coins
+    try:
+        response = requests.get(
+            "https://api.coingecko.com/api/v3/coins/list"
+        )
+        response.raise_for_status()
+        data = response.json()
+        valid_coins = [coin['id'].lower() for coin in data]
+        cache.set('valid_coins', valid_coins, timeout=86400)  # Cache for 24 hours
+        logger.info(f"Fetched {len(valid_coins)} valid coins from CoinGecko")
+        return valid_coins
+    except requests.RequestException as e:
+        logger.error(f"Error fetching valid coins: {e}")
+        return []
 
 def fetch_news():
     try:
-        # Replace 'YOUR_NEWSAPI_KEY' with your actual NewsAPI key
-        api_key = "7e82ca805a4a46cbacee1c77a36c9028"  # <--- Replace with your NewsAPI key
+        api_key = getattr(settings, 'NEWSAPI_KEY', 'your-newsapi-key')
         url = f"https://newsapi.org/v2/everything?q=cryptocurrency+bitcoin+ethereum&apiKey={api_key}&language=en&sortBy=publishedAt&pageSize=20"
         response = requests.get(url)
         response.raise_for_status()
@@ -41,11 +68,10 @@ def fetch_news():
         return []
 
 def analyze_article_sentiment(text):
-    # Placeholder: Simple keyword-based sentiment analysis
     positive_keywords = ["bullish", "surge", "rise", "gain", "success", "growth"]
     negative_keywords = ["bearish", "drop", "fall", "crash", "loss", "decline"]
     text = text.lower()
-    score = 0.5  # Neutral
+    score = 0.5
     if any(keyword in text for keyword in positive_keywords):
         score = 0.7
     elif any(keyword in text for keyword in negative_keywords):
@@ -55,7 +81,6 @@ def analyze_article_sentiment(text):
 
 def fetch_sentiment():
     try:
-        # Placeholder: Replace with a real sentiment API if available
         response = requests.get("https://api.sentiment.io/v1/crypto-sentiment")
         response.raise_for_status()
         data = response.json()
