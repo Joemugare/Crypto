@@ -277,3 +277,29 @@ def fetch_news() -> List[Dict]:
     except Exception as e:
         logger.error(f"Error fetching news: {e}", exc_info=True)
         return cached_news if cached_news else _get_fallback_data('fetch_news')
+
+# Add the missing fetch_sentiment function
+@adaptive_rate_limit_handler(max_retries=2, base_delay=10)
+def fetch_sentiment() -> Dict[str, Union[float, str]]:
+    """
+    Fetch overall market sentiment by analyzing recent news articles
+    """
+    try:
+        articles = fetch_news()
+        if not articles:
+            return _get_fallback_data('fetch_sentiment')
+        
+        # Calculate average sentiment from all articles
+        total_score = sum(article['sentiment']['score'] for article in articles)
+        avg_score = total_score / len(articles)
+        
+        # Convert to label
+        label = ("Very Positive" if avg_score > 0.65 else 
+                 "Positive" if avg_score > 0.55 else 
+                 "Neutral" if avg_score > 0.45 else 
+                 "Negative" if avg_score > 0.35 else "Very Negative")
+        
+        return {"score": round(avg_score, 3), "label": label}
+    except Exception as e:
+        logger.error(f"Error calculating sentiment: {e}", exc_info=True)
+        return _get_fallback_data('fetch_sentiment')
