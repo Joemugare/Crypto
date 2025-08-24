@@ -164,16 +164,19 @@ def analyze_article_sentiment(text):
 @rate_limit_handler(max_retries=2, base_delay=15)
 def fetch_sentiment():
     """
-    Fetch sentiment data with caching.
+    Fetch sentiment data with caching, falling back to news-based sentiment if API fails.
     Cache results for 15 minutes.
     """
-    # Check cache first
     cached_sentiment = cache.get('crypto_sentiment')
     if cached_sentiment is not None:
         logger.info("Retrieved sentiment data from cache")
         return cached_sentiment
     
     try:
+        # Optional: Check DNS resolution to avoid unnecessary retries
+        import socket
+        socket.gethostbyname('api.sentiment.io')  # Raises socket.gaierror if DNS fails
+        
         response = requests.get("https://api.sentiment.io/v1/crypto-sentiment", timeout=30)
         response.raise_for_status()
         data = response.json()
@@ -181,18 +184,26 @@ def fetch_sentiment():
         label = "Positive" if score > 0.6 else "Negative" if score < 0.4 else "Neutral"
         
         sentiment_data = {"score": score, "label": label}
-        
-        # Cache for 15 minutes
         cache.set('crypto_sentiment', sentiment_data, timeout=900)
-        logger.info("Fetched and cached sentiment data")
+        logger.info("Fetched and cached sentiment data from API")
         return sentiment_data
         
-    except requests.RequestException as e:
-        logger.error(f"Error fetching sentiment: {e}")
+    except (requests.RequestException, socket.gaierror) as e:
+        logger.error(f"Error fetching sentiment from API: {e}")
+        # Fallback to news-based sentiment
+        news = fetch_news()
+        if news:
+            avg_score = sum(article['sentiment']['score'] for article in news) / len(news)
+            label = "Positive" if avg_score > 0.6 else "Negative" if avg_score < 0.4 else "Neutral"
+            sentiment_data = {"score": avg_score, "label": label}
+            logger.info("Using news-based sentiment as fallback")
+            cache.set('crypto_sentiment', sentiment_data, timeout=900)
+            return sentiment_data
+        # Default fallback if news is unavailable
+        logger.warning("No news data available, returning default sentiment")
         return {"score": 0.5, "label": "Neutral"}
 
 # Utility function to clear all caches if needed
 def clear_all_caches():
     """Clear all cached data"""
     cache.delete_many(['market_data', 'valid_coins', 'crypto_news', 'crypto_sentiment'])
-
