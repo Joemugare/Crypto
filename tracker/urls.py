@@ -1,31 +1,70 @@
 from django.urls import path
-from . import views
+from django.contrib.auth import views as auth_views
+from .views import (
+    HealthCheckView, ReadinessCheckView,
+    home, dashboard, portfolio, add_to_portfolio, edit_asset, remove_asset,
+    watchlist, add_to_watchlist, alerts, add_alert, technical,
+    custom_login, custom_logout, register, profile, settings,
+    search, about, contact, terms, privacy, news, live_charts,
+    market_data_api, alerts_api, clear_cache
+)
+
+# app_name = 'tracker'  # Comment out to remove namespace
 
 urlpatterns = [
-    path('', views.home, name='home'),
-    path('dashboard/', views.dashboard, name='dashboard'),
-    path('portfolio/', views.portfolio, name='portfolio'),
-    path('portfolio/add/', views.add_to_portfolio, name='add_to_portfolio'),
-    path('portfolio/edit/<str:cryptocurrency>/', views.edit_asset, name='edit_asset'),  # New
-    path('portfolio/remove/<str:cryptocurrency>/', views.remove_asset, name='remove_asset'),  # New
-    path('watchlist/', views.watchlist, name='watchlist'),
-    path('watchlist/add/', views.add_to_watchlist, name='add_to_watchlist'),
-    path('alerts/', views.alerts, name='alerts'),
-    path('alerts/add/', views.add_alert, name='add_alert'),
-    path('alerts/api/', views.alerts_api, name='alerts_api'),
-    path('technical/', views.technical, name='technical'),
-    path('login/', views.custom_login, name='login'),
-    path('logout/', views.custom_logout, name='logout'),
-    path('register/', views.register, name='register'),
-    path('profile/', views.profile, name='profile'),
-    path('settings/', views.settings, name='settings'),
-    path('search/', views.search, name='search'),
-    path('about/', views.about, name='about'),
-    path('contact/', views.contact, name='contact'),
-    path('terms/', views.terms, name='terms'),
-    path('privacy/', views.privacy, name='privacy'),
-    path('news/', views.news, name='news'),
-    path('live-charts/', views.live_charts, name='live_charts'),
-    path('api/market-data/', views.market_data_api, name='market_data_api'),
-    path('clear-cache/', views.clear_cache, name='clear_cache'),
+    # Health check endpoints
+    path('health/', HealthCheckView.as_view(), name='health_check'),
+    path('ready/', ReadinessCheckView.as_view(), name='readiness_check'),
+    
+    # Main pages
+    path('', home, name='home'),
+    path('dashboard/', dashboard, name='dashboard'),
+    
+    # Portfolio management
+    path('portfolio/', portfolio, name='portfolio'),
+    path('portfolio/add/', add_to_portfolio, name='add_to_portfolio'),
+    path('portfolio/edit/<str:cryptocurrency>/', edit_asset, name='edit_asset'),
+    path('portfolio/remove/<str:cryptocurrency>/', remove_asset, name='remove_asset'),
+    
+    # Watchlist
+    path('watchlist/', watchlist, name='watchlist'),
+    path('watchlist/add/', add_to_watchlist, name='add_to_watchlist'),
+    
+    # Alerts
+    path('alerts/', alerts, name='alerts'),
+    path('alerts/add/', add_alert, name='add_alert'),
+    
+    # Analysis
+    path('technical/', technical, name='technical'),
+    path('news/', news, name='news'),
+    path('live-charts/', live_charts, name='live_charts'),
+    
+    # Authentication
+    path('login/', custom_login, name='login'),
+    path('logout/', custom_logout, name='logout'),
+    path('register/', register, name='register'),
+    
+    # User management
+    path('profile/', profile, name='profile'),
+    path('settings/', settings, name='settings'),
+    
+    # Utility pages
+    path('search/', search, name='search'),
+    path('about/', about, name='about'),
+    path('contact/', contact, name='contact'),
+    path('terms/', terms, name='terms'),
+    path('privacy/', privacy, name='privacy'),
+    
+    # API endpoints
+    path('api/market-data/', market_data_api, name='market_data_api'),
+    path('api/alerts/', alerts_api, name='alerts_api'),
+    
+    # Admin utilities
+    path('clear-cache/', clear_cache, name='clear_cache'),
+    
+    # Password reset URLs (using Django's built-in views)
+    path('password_reset/', auth_views.PasswordResetView.as_view(template_name='registration/password_reset.html'), name='password_reset'),
+    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='registration/password_reset_done.html'), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='registration/password_reset_confirm.html'), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='registration/password_reset_complete.html'), name='password_reset_complete'),
 ]

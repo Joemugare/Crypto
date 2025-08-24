@@ -195,4 +195,4 @@ def fetch_sentiment():
 def clear_all_caches():
     """Clear all cached data"""
     cache.delete_many(['market_data', 'valid_coins', 'crypto_news', 'crypto_sentiment'])
-    logger.info("Cleared all cached data")
+
