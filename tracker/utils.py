@@ -8,7 +8,7 @@ import os
 
 logger = logging.getLogger(__name__)
 
-def rate_limit_handler(max_retries=5, base_delay=180):
+def rate_limit_handler(max_retries=3, base_delay=180):
     """Decorator to handle rate limiting with exponential backoff and cache-based lock"""
     def decorator(func):
         @wraps(func)
@@ -32,7 +32,7 @@ def rate_limit_handler(max_retries=5, base_delay=180):
                     except requests.exceptions.HTTPError as e:
                         if e.response.status_code == 429:  # Too Many Requests
                             if attempt < max_retries - 1:
-                                delay = base_delay * (2 ** attempt)  # Exponential backoff
+                                delay = base_delay * (2 ** attempt)
                                 logger.warning(f"Rate limit hit for {func.__name__}. Retrying in {delay}s... (attempt {attempt + 1}/{max_retries})")
                                 time.sleep(delay)
                                 continue
@@ -57,36 +57,37 @@ def rate_limit_handler(max_retries=5, base_delay=180):
         return wrapper
     return decorator
 
-@rate_limit_handler(max_retries=5, base_delay=180)
+@rate_limit_handler(max_retries=3, base_delay=180)
 def fetch_market_data():
     """
     Fetch market data with caching and rate limit handling.
     Cache results for 2 hours to reduce API calls on Render.
     """
-    # Log service spin-up and delay to avoid rate limits on Render
+    is_render = os.getenv('RENDER', 'false').lower() == 'true'
+    spin_up_delay = 5 if not is_render else 30
+
     logger.info("Checking service spin-up for fetch_market_data")
     spin_up_time = cache.get('service_spin_up')
     if not spin_up_time:
         cache.set('service_spin_up', time.time(), timeout=3600)
-        logger.info("Service spin-up detected; delaying API call by 30s")
-        time.sleep(30)  # Delay to avoid rate limit on Render spin-up
+        logger.info(f"Service spin-up detected; delaying API call by {spin_up_delay}s")
+        time.sleep(spin_up_delay)
     
-    # Check cache first
     cached_data = cache.get('market_data')
     if cached_data is not None:
         logger.info(f"Retrieved market data from cache ({len(cached_data)} coins)")
         return cached_data
     
-    # Check last API call time to avoid rate limits
     last_call = cache.get('market_data_last_call')
-    if last_call and (time.time() - last_call) < 180:  # Wait 180s between calls
+    if last_call and (time.time() - last_call) < 180:
         logger.warning("Skipping CoinGecko API call due to recent request")
         return cached_data if cached_data is not None else default_market_data()
     
     try:
         url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false"
+        headers = {'Authorization': f'Bearer {settings.COINGECKO_API_KEY}'} if settings.COINGECKO_API_KEY else {}
         logger.debug(f"Calling CoinGecko API: {url}")
-        response = requests.get(url, timeout=30)
+        response = requests.get(url, headers=headers, timeout=30)
         logger.debug(f"CoinGecko API response status: {response.status_code}")
         response.raise_for_status()
         data = response.json()
@@ -101,14 +102,13 @@ def fetch_market_data():
                 "usd": coin['current_price'],
                 "usd_24h_change": coin['price_change_percentage_24h'],
                 "volume_24h": coin['total_volume'],
-                "sentiment": "Neutral"  # Placeholder
+                "sentiment": "Neutral"
             } for coin in data if 'id' in coin and 'current_price' in coin
         }
         
-        # Cache for 2 hours
         cache.set('market_data', market_data, timeout=7200)
         cache.set('market_data_last_call', time.time(), timeout=7200)
-        cache.set('fetch_market_data_cache', market_data, timeout=86400)  # Stale cache for 24 hours
+        cache.set('fetch_market_data_cache', market_data, timeout=86400)
         logger.info(f"Fetched and cached {len(market_data)} coins for market data")
         return market_data
         
@@ -141,14 +141,12 @@ def fetch_valid_coins():
         return valid_coins
     
     try:
-        response = requests.get(
-            "https://api.coingecko.com/api/v3/coins/list",
-            timeout=30
-        )
+        headers = {'Authorization': f'Bearer {settings.COINGECKO_API_KEY}'} if settings.COINGECKO_API_KEY else {}
+        response = requests.get("https://api.coingecko.com/api/v3/coins/list", headers=headers, timeout=30)
         response.raise_for_status()
         data = response.json()
         valid_coins = [coin['id'].lower() for coin in data]
-        cache.set('valid_coins', valid_coins, timeout=86400)  # Cache for 24 hours
+        cache.set('valid_coins', valid_coins, timeout=86400)
         logger.info(f"Fetched {len(valid_coins)} valid coins from CoinGecko")
         return valid_coins
     except requests.RequestException as e:
@@ -161,15 +159,14 @@ def fetch_news():
     Fetch news with caching to reduce API calls.
     Cache results for 10 minutes.
     """
-    # Check cache first
     cached_news = cache.get('crypto_news')
     if cached_news is not None:
         logger.info(f"Retrieved {len(cached_news)} news articles from cache")
         return cached_news
     
     try:
-        api_key = getattr(settings, 'NEWSAPI_KEY', 'your-newsapi-key')
-        if api_key == 'your-newsapi-key':
+        api_key = settings.NEWSAPI_KEY
+        if not api_key:
             logger.warning("NewsAPI key not configured")
             return []
             
@@ -187,7 +184,6 @@ def fetch_news():
             "sentiment": analyze_article_sentiment(article["title"] + " " + (article["description"] or ""))
         } for article in articles]
         
-        # Cache for 10 minutes
         cache.set('crypto_news', news_data, timeout=600)
         logger.info(f"Fetched and cached {len(news_data)} news articles")
         return news_data
@@ -227,11 +223,9 @@ def fetch_sentiment():
         return cached_sentiment
     
     try:
-        # Optional: Check DNS resolution to avoid unnecessary retries
         import socket
-        socket.gethostbyname('api.sentiment.io')  # Raises socket.gaierror if DNS fails
-        
-        response = requests.get("https://api.sentiment.io/v1/crypto-sentiment", timeout=30)
+        socket.gethostbyname('api.sentiment.io')
+        response = requests.get(settings.SENTIMENT_API_URL, timeout=30)
         response.raise_for_status()
         data = response.json()
         score = data.get("score", 0.5)
@@ -244,7 +238,6 @@ def fetch_sentiment():
         
     except (requests.RequestException, socket.gaierror) as e:
         logger.error(f"Error fetching sentiment from API: {e}")
-        # Fallback to news-based sentiment
         news = fetch_news()
         if news:
             avg_score = sum(article['sentiment']['score'] for article in news) / len(news)
@@ -253,11 +246,9 @@ def fetch_sentiment():
             logger.info("Using news-based sentiment as fallback")
             cache.set('crypto_sentiment', sentiment_data, timeout=900)
             return sentiment_data
-        # Default fallback if news is unavailable
         logger.warning("No news data available, returning default sentiment")
         return {"score": 0.5, "label": "Neutral"}
 
-# Utility function to clear all caches if needed
 def clear_all_caches():
     """Clear all cached data"""
     cache.delete_many(['market_data', 'valid_coins', 'crypto_news', 'crypto_sentiment', 'market_data_last_call', 'fetch_market_data_cache', 'service_spin_up', 'lock:fetch_market_data'])
